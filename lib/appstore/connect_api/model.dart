@@ -1,14 +1,11 @@
-abstract class Model {
-  String get type;
-  final String id;
-
+class ModelParser {
   static List<T> parseList<T extends Model>(Map<String, dynamic> envelope) {
-    final Map<String, Map<String, Model>> includedModels = {};
+    final includedModels = <String, Map<String, Model>>{};
     if (envelope.containsKey('included')) {
       final includedData = envelope['included'].cast<Map<String, dynamic>>();
       for (final data in includedData) {
         final model = parse(data, includedModels);
-        includedModels.putIfAbsent(model.type, () => {})[model.id] = model;
+        includedModels.putIfAbsent(model._type, () => {})[model.id] = model;
       }
     }
 
@@ -22,35 +19,53 @@ abstract class Model {
     final type = data['type'] as String;
     final id = data['id'] as String;
     final attributes = data['attributes'] as Map<String, dynamic>;
-
-    final Map<String, List<Model>> relations = {};
-    if (data.containsKey('relationships')) {
-      final relationShips = data['relationships'] as Map<String, dynamic>;
-      for (final entry in relationShips.entries) {
-        final relatedType = entry.key;
-        if (includes.containsKey(relatedType)) {
-          final relationShip = entry.value as Map<String, dynamic>;
-          if (relationShip.containsKey('data')) {
-            final relationShipIds = relationShip['data'].cast<Map<String, dynamic>>();
-            for (final element in relationShipIds) {
-              final relatedId = element['id'] as String;
-              relations.putIfAbsent(relatedType, () => []).add(includes[relatedType]![relatedId]!);
-            }
-          }
-        }
-      }
-    }
+    final relations = data.containsKey('relationships')
+        ? _parseRelations(data['relationships'] as Map<String, dynamic>, includes)
+        : <String, dynamic>{};
 
     return Model._fromJson(type, id, attributes, relations);
   }
 
-  Model._(this.id);
-  factory Model._fromJson(String type, String id, Map<String, dynamic> attributes, Map<String, List<Model>> relations) {
+  static Map<String, dynamic> _parseRelations(Map<String, dynamic> data, Map<String, Map<String, Model>> includes) {
+    final relations = <String, dynamic>{};
+    for (final entry in data.entries) {
+      final relationName = entry.key;
+      final relationShip = entry.value as Map<String, dynamic>;
+      final relationShipData = relationShip['data'];
+      if (relationShipData != null) {
+        if (relationShipData is List) {
+          for (final element in relationShipData) {
+            final relatedType = element['type'] as String;
+            final relatedId = element['id'] as String;
+            relations.putIfAbsent(relationName, () => []).add(includes[relatedType]![relatedId]!);
+          }
+        } else {
+          final relatedType = relationShipData['type'] as String;
+          final relatedId = relationShipData['id'] as String;
+          relations[relationName] = includes[relatedType]![relatedId]!;
+        }
+      }
+    }
+
+    return relations;
+  }
+}
+
+abstract class Model {
+  final String _type;
+  final String id;
+
+  Model._(this.id, this._type);
+  factory Model._fromJson(String type, String id, Map<String, dynamic> attributes, Map<String, dynamic> relations) {
     switch (type) {
-      case App._type:
+      case App.type:
         return App._(id, attributes, relations);
-      case AppStoreVersion._type:
-        return AppStoreVersion._(id, attributes);
+      case AppStoreVersion.type:
+        return AppStoreVersion._(id, attributes, relations);
+      case AppStoreVersionPhasedRelease.type:
+        return AppStoreVersionPhasedRelease._(id, attributes);
+      case Build.type:
+        return Build._(id, attributes);
       default:
         throw Exception('Type $type is not supported yet');
     }
@@ -58,7 +73,7 @@ abstract class Model {
 }
 
 class App extends Model {
-  static const _type = 'apps';
+  static const type = 'apps';
   static const fields = ['name', 'bundleId', 'sku', 'primaryLocale'];
 
   final String name;
@@ -67,15 +82,13 @@ class App extends Model {
   final String primaryLocale;
   final List<AppStoreVersion> versions;
 
-  App._(String id, Map<String, dynamic> attributes, Map<String, List<Model>> relations)
+  App._(String id, Map<String, dynamic> attributes, Map<String, dynamic> relations)
       : name = attributes['name'],
         bundleId = attributes['bundleId'],
         sku = attributes['sku'],
         primaryLocale = attributes['primaryLocale'],
         versions = relations['appStoreVersions']?.cast<AppStoreVersion>() ?? [],
-        super._(id);
-
-  String get type => _type;
+        super._(id, type);
 
   AppStoreVersion? get liveVersion {
     return versions.where((version) => version.live).first;
@@ -87,22 +100,25 @@ class App extends Model {
 }
 
 class AppStoreVersion extends Model {
-  static const _type = 'appStoreVersions';
+  static const type = 'appStoreVersions';
   static const fields = ['versionString', 'appStoreState', 'releaseType'];
 
   final String name;
   final AppStoreState state;
   final ReleaseType releaseType;
+  final AppStoreVersionPhasedRelease? phasedRelease;
+  final Build? build;
 
-  AppStoreVersion._(String id, Map<String, dynamic> attributes)
+  AppStoreVersion._(String id, Map<String, dynamic> attributes, Map<String, dynamic> relations)
       : name = attributes['versionString'],
         state = AppStoreState._(attributes['appStoreState']),
         releaseType = ReleaseType._(attributes['releaseType']),
-        super._(id);
+        phasedRelease = relations['appStoreVersionPhasedRelease'] as AppStoreVersionPhasedRelease?,
+        build = relations['build'] as Build?,
+        super._(id, type);
 
-  String get type => _type;
-  bool get live => AppStoreState._liveStates.contains(state);
-  bool get editable => AppStoreState._editStates.contains(state);
+  bool get live => AppStoreState.liveStates.contains(state);
+  bool get editable => AppStoreState.editStates.contains(state);
 }
 
 class AppStoreState {
@@ -119,7 +135,7 @@ class AppStoreState {
   static const metadataRejected = AppStoreState._('METADATA_REJECTED');
   static const invalidBinary = AppStoreState._('INVALID_BINARY');
 
-  static const _liveStates = [
+  static const liveStates = [
     readyForSale,
     pendingAppleRelease,
     pendingDeveloperRelease,
@@ -127,7 +143,7 @@ class AppStoreState {
     inReview,
     developerRemovedFromSale
   ];
-  static const _editStates = [
+  static const editStates = [
     prepareForSubmission,
     developerRejected,
     rejected,
@@ -154,4 +170,66 @@ class ReleaseType {
   const ReleaseType._(this._name);
 
   String toString() => _name;
+}
+
+class AppStoreVersionPhasedRelease extends Model {
+  static const type = 'appStoreVersionPhasedReleases';
+  static const fields = ['phasedReleaseState', 'totalPauseDuration', 'currentDayNumber'];
+  static const _userFractions = {1: 0.01, 2: 0.05, 3: 0.1, 4: 0.5, 5: 1.0};
+
+  final PhasedReleaseState state;
+  final Duration pauseDuration;
+  final int dayNumber;
+
+  AppStoreVersionPhasedRelease._(String id, Map<String, dynamic> attributes)
+      : state = enumfromString(PhasedReleaseState.values, (attributes['phasedReleaseState'] as String).toLowerCase()),
+        pauseDuration = Duration(seconds: attributes['totalPauseDuration']),
+        dayNumber = attributes['currentDayNumber'],
+        super._(id, type);
+
+  double get userFraction {
+    if (state == PhasedReleaseState.complete) {
+      return 1;
+    } else if (state == PhasedReleaseState.active) {
+      return _userFractions[dayNumber] ?? 0;
+    } else {
+      return 0;
+    }
+  }
+}
+
+enum PhasedReleaseState {
+  inactive,
+  active,
+  paused,
+  complete,
+}
+
+T enumfromString<T>(List<T> values, String value) {
+  return values.firstWhere((it) => enumToString(it) == value);
+}
+
+String enumToString<T>(T member) {
+  final name = member.toString();
+  return name.substring(name.indexOf('.') + 1);
+}
+
+class Build extends Model {
+  static const type = 'builds';
+
+  final String version;
+  final ProcessingState processingState;
+
+  Build._(String id, Map<String, dynamic> attributes)
+      : version = attributes['version'],
+        processingState =
+            enumfromString(ProcessingState.values, (attributes['processingState'] as String).toLowerCase()),
+        super._(id, type);
+}
+
+enum ProcessingState {
+  processing,
+  failed,
+  invalid,
+  valid,
 }

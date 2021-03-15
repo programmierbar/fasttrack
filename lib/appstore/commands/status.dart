@@ -1,6 +1,7 @@
 import 'package:args/command_runner.dart';
 import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/client.dart';
+import 'package:fasttrack/appstore/connect_api/model.dart';
 
 class AppStoreStatusCommand extends Command {
   final name = 'status';
@@ -10,33 +11,36 @@ class AppStoreStatusCommand extends Command {
 
   Future<void> run() async {
     final config = AppStoreConfig(
-        keyId: '47KUQ5A2CF',
-        issuerId: '69a6de6f-9699-47e3-e053-5b8c7c11a4d1',
-        keyFile: './credentials/AuthKey_47KUQ5A2CF.pem',
-        bundleIds: {
-          'de': 'de.lotum.4pics1word',
-          'en': 'de.lotum.4pics1worden',
-          'fr': 'de.lotum.4pics1wordfr',
-          'es': 'de.lotum.4pics1wordes',
-          'it': 'de.lotum.4pics1wordit',
-          'br': 'de.lotum.4pics1wordbr',
-          'nl': 'de.lotum.4pics1wordnl',
-          'ru': 'de.lotum.4pics1wordru'
-        });
+      keyId: '47KUQ5A2CF',
+      issuerId: '69a6de6f-9699-47e3-e053-5b8c7c11a4d1',
+      keyFile: './credentials/AuthKey_47KUQ5A2CF.pem',
+      appIds: {
+        'de': '595098366',
+        'en': '595558452',
+        'fr': '596006531',
+        'es': '598945891',
+        'it': '598938741',
+        'br': '814352052',
+        'nl': '601316585',
+        'ru': '598949838'
+      },
+    );
 
     final client = AppStoreConnectClient(config);
-    final apps = await client.getApps(bundleIds: config.bundleIds.values.toList());
+    final versions = await Future.wait(config.appIds.values.map((id) => client.getVersions(id)));
 
-    for (final app in apps) {
-      final version = app.liveVersion;
-      if (version != null) {
-        final parts = [
-          '${app.bundleId}:',
+    final appVersions = Map.fromIterables(config.appIds.keys, versions);
+    for (final entry in appVersions.entries) {
+      for (final version in entry.value) {
+        final parts = <dynamic?>[
+          '${entry.key}:',
           version.name,
-          //'(${release.versionCodes?.join(', ')})',
+          if (version.build != null) //
+            '(${version.build?.version})',
           '->',
           version.state,
-          //release.userFraction != null ? '${release.userFraction! * 100}%' : null,
+          if (version.phasedRelease != null) //
+            ...[enumToString(version.phasedRelease!.state), version.phasedRelease!.userFraction]
         ];
         print(parts.where((part) => part != null).join(' '));
       }

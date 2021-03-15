@@ -5,35 +5,22 @@ import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/appstore/connect_api/token.dart';
 import 'package:http/http.dart';
 
-// https://github.com/fastlane/fastlane/blob/f075aff8776e3a3eb6f48f7fe84c338778bf62ae/spaceship/docs/AppStoreConnect.md
-
 class AppStoreConnectClient {
-  static const _apiUri = 'https://api.appstoreconnect.apple.com/v1/';
-
   final AppStoreConfig _config;
-  final Client _client;
+  final Client _client = Client();
 
   AppStoreConnectToken? _token;
 
-  AppStoreConnectClient(this._config) : _client = Client();
-
-  Future<AppStoreConnectToken> get __token async {
-    return _token ??= await AppStoreConnectToken.fromFile(
-      keyId: _config.keyId,
-      issuerId: _config.issuerId,
-      path: _config.keyFile,
-    );
-  }
+  AppStoreConnectClient(this._config);
 
   Future<List<App>> getApps({List<String>? bundleIds}) async {
-    final response = await _get(
-      'apps',
-      filters: {if (bundleIds != null) 'bundleId': bundleIds},
-      includes: ['appStoreVersions'],
-      fields: {'appStoreVersions': AppStoreVersion.fields},
-      limits: {'appStoreVersions': 3},
-    );
+    final request = _Request('apps');
+    request.include(AppStoreVersion.type, fields: AppStoreVersion.fields, limit: 2);
+    if (bundleIds != null) {
+      request.filter('bundleId', bundleIds);
+    }
 
+    final response = await _get(request);
     final apps = response.asList<App>();
 
     return (bundleIds != null) //
@@ -41,49 +28,75 @@ class AppStoreConnectClient {
         : apps;
   }
 
-  Future<_Response> _get(
-    String path, {
-    Map<String, dynamic>? filters,
-    List<String>? includes,
-    Map<String, dynamic>? fields,
-    Map<String, int>? limits,
-  }) async {
-    final uri = _Uri(_apiUri, path);
-    if (filters != null) uri.param('filter', filters);
-    if (includes != null) uri.param('include', includes);
-    if (fields != null) uri.param('fields', fields);
-    if (limits != null) uri.param('limit', limits);
+  Future<List<AppStoreVersion>> getVersions(String appId) async {
+    final request = _Request('apps/$appId/appStoreVersions') //
+      ..filter('appStoreState', AppStoreState.liveStates)
+      ..include('appStoreVersionPhasedRelease')
+      ..include('build');
 
-    final token = await __token;
-    final response = await _client.get(uri.toUri(), headers: {
+    final response = await _get(request);
+    return response.asList<AppStoreVersion>();
+  }
+
+  Future<_Response> _get(_Request request) async {
+    final uri = request.toUri();
+    final token = await _getToken();
+    final response = await _client.get(uri, headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${token.value}',
     });
+    //print('Received response ${response.body}');
 
     return _Response(response);
   }
+
+  Future<AppStoreConnectToken> _getToken() async {
+    return _token ??= await AppStoreConnectToken.fromFile(
+      keyId: _config.keyId,
+      issuerId: _config.issuerId,
+      path: _config.keyFile,
+    );
+  }
 }
 
-class _Uri {
-  final String _uri;
-  final Map<String, dynamic> _params = {};
+class _Request {
+  static const _apiUri = 'https://api.appstoreconnect.apple.com/v1/';
 
-  _Uri(String root, String path) : _uri = root + path;
+  final String _path;
+  final Map<String, dynamic> _filters = {};
+  final Set<String> _includes = {};
+  final Map<String, String> _fields = {};
+  final Map<String, int> _limits = {};
 
-  void param(String name, dynamic value) {
-    if (value is Map) {
-      for (final entry in value.entries) {
-        param('$name[${entry.key}]', entry.value);
-      }
-    } else if (value is List) {
-      _params[name] = value.map((item) => item.toString()).join(',');
-    } else {
-      _params[name] = value.toString();
+  _Request(this._path);
+
+  void filter(String name, dynamic value) {
+    _filters[name] = value is List ? value.map((item) => item.toString()).join(',') : value;
+  }
+
+  void include(String type, {List<String>? fields, int? limit}) {
+    _includes.add(type);
+    if (fields != null) {
+      _fields[type] = fields.join(',');
+    }
+    if (limit != null) {
+      _limits[type] = limit;
     }
   }
 
   Uri toUri() {
-    return Uri.parse(_uri).replace(queryParameters: _params);
+    final params = <String, dynamic>{
+      for (final filter in _filters.entries) //
+        'filter[${filter.key}]': filter.value,
+      if (_includes.isNotEmpty) //
+        'include': _includes.join(','),
+      for (final fields in _fields.entries) //
+        'fields[${fields.key}]': fields.value,
+      for (final limit in _limits.entries) //
+        'limit[${limit.key}]': limit.value.toString()
+    };
+
+    return Uri.parse(_apiUri + _path).replace(queryParameters: params);
   }
 }
 
@@ -95,5 +108,5 @@ class _Response {
   int get status => _response.statusCode;
   Map<String, dynamic> get json => jsonDecode(_response.body);
 
-  List<T> asList<T extends Model>() => Model.parseList<T>(json);
+  List<T> asList<T extends Model>() => ModelParser.parseList<T>(json);
 }
