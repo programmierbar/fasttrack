@@ -4,6 +4,12 @@ import 'dart:typed_data';
 
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
+abstract class AppStoreConnectTokenConfig {
+  String get keyId;
+  String get issuerId;
+  String get keyFile;
+}
+
 class AppStoreConnectToken {
   static Future<AppStoreConnectToken> fromFile({
     required String keyId,

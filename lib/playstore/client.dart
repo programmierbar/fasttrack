@@ -3,12 +3,12 @@ import 'dart:io' as io;
 import 'package:googleapis/androidpublisher/v3.dart';
 import 'package:googleapis_auth/auth_io.dart';
 
-class ApiClient {
+class PlayStoreApiClient {
   final String _jsonKeyFile;
   late final AuthClient _client;
   late final AndroidPublisherApi _api;
 
-  ApiClient(this._jsonKeyFile);
+  PlayStoreApiClient(this._jsonKeyFile);
 
   Future<void> connect() async {
     final content = await io.File(_jsonKeyFile).readAsString();

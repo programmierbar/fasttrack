@@ -1,12 +1,11 @@
 import 'dart:convert';
 
-import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/appstore/connect_api/token.dart';
 import 'package:http/http.dart';
 
 class AppStoreConnectClient {
-  final AppStoreConfig _config;
+  final AppStoreConnectTokenConfig _config;
   final Client _client = Client();
 
   AppStoreConnectToken? _token;
