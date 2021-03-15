@@ -7,7 +7,6 @@ class Platform {
   const Platform(this.name);
 
   int get hashCode => name.hashCode;
-
   bool operator ==(dynamic other) => other is Platform && other.name == name;
   String toString() => name;
 }

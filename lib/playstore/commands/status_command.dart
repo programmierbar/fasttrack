@@ -1,7 +1,7 @@
 import 'package:args/command_runner.dart';
-import 'package:fasttrack/android/store_controller.dart';
 import 'package:fasttrack/common/language.dart';
 import 'package:fasttrack/common/platform.dart';
+import 'package:fasttrack/playstore/store_controller.dart';
 
 class StatusCommand extends Command {
   final name = 'status';

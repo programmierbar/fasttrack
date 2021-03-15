@@ -1,5 +1,5 @@
-import 'package:fasttrack/android/api_client.dart';
 import 'package:fasttrack/common/language.dart';
+import 'package:fasttrack/playstore/api_client.dart';
 
 const _jsonKeyFile = './credentials/pics-8f026-f32e0b8abb61.json';
 final _packageNames = {
