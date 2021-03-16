@@ -19,14 +19,54 @@ class PlayStoreApiClient {
     _api = AndroidPublisherApi(_client);
   }
 
-  Future<List<TrackRelease>?> getReleases({required String package, required String track}) async {
-    final edits = _api.edits;
-    final edit = await edits.insert(AppEdit(), package);
-    final info = await edits.tracks.get(package, edit.id!, track);
-    return info.releases;
+  PlayStoreTrackResource getTrackResource({required String packageName}) {
+    return PlayStoreTrackResource._(_api, packageName);
   }
 
   void close() {
     _client.close();
+  }
+}
+
+class PlayStoreResource {
+  final String packageName;
+  final EditsResource _resource;
+  AppEdit? _edit;
+
+  PlayStoreResource._(AndroidPublisherApi api, this.packageName) : _resource = api.edits;
+
+  Future<void> _begin() async {
+    _edit ??= await _resource.insert(AppEdit(), packageName);
+  }
+
+  Future<void> validate() async {
+    assert(_edit != null);
+    await _resource.validate(packageName, _edit!.id!);
+  }
+
+  Future<void> commit() async {
+    assert(_edit != null);
+    await _resource.commit(packageName, _edit!.id!);
+    _edit = null;
+  }
+
+  Future<void> abort() async {
+    assert(_edit != null);
+    await _resource.delete(packageName, _edit!.id!);
+    _edit = null;
+  }
+}
+
+class PlayStoreTrackResource extends PlayStoreResource {
+  PlayStoreTrackResource._(AndroidPublisherApi api, String packageName) : super._(api, packageName);
+
+  Future<Track> get({required String track}) async {
+    await _begin();
+    return await _resource.tracks.get(packageName, _edit!.id!, track);
+  }
+
+  Future<void> update(Track track) async {
+    await _begin();
+    await _resource.tracks.update(track, packageName, _edit!.id!, track.track!);
   }
 }

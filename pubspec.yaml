@@ -12,3 +12,4 @@ dependencies:
   googleapis: ^2.0.0
   googleapis_auth: ^1.1.0
   dart_jsonwebtoken: ^2.0.0-nullsafety.1
+  dart_console: ^1.0.0
