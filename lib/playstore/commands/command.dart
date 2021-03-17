@@ -39,7 +39,7 @@ abstract class PlayStoreCommand extends Command {
     return appIds.map((id) {
       final task = setupTask();
       task.appId = id;
-      task.resource = client.getTrackResource(packageName: config.packageNames[id]!);
+      task.api = client.getTrackApi(packageName: config.packageNames[id]!);
       return task;
     }).toList();
   }
@@ -54,5 +54,5 @@ abstract class PlayStoreCommand extends Command {
 }
 
 abstract class PlayStoreCommandTask extends CommandTask {
-  late final PlayStoreTrackResource resource;
+  late final PlayStoreTrackApi api;
 }

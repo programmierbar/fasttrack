@@ -16,7 +16,7 @@ abstract class Command extends args.Command {
     }
     var line = console.cursorPosition!.row - tasks.length;
     for (final task in tasks) {
-      task.output = ConsoleOutput._(console, line++);
+      task._output = ConsoleOutput._(console, line++);
     }
     console.hideCursor();
 
@@ -29,22 +29,18 @@ abstract class Command extends args.Command {
 
 abstract class CommandTask {
   late final String appId;
-  late final ConsoleOutput output;
+  late final ConsoleOutput _output;
 
   CommandTask();
 
   Future<void> run();
-}
 
-class StatusColor {
-  static const info = StatusColor._(ConsoleColor.white);
-  static const success = StatusColor._(ConsoleColor.green);
-  static const warning = StatusColor._(ConsoleColor.yellow);
-  static const error = StatusColor._(ConsoleColor.red);
-
-  final ConsoleColor _color;
-
-  const StatusColor._(this._color);
+  void writeSuccess(String text) => write(text, color: ConsoleColor.green);
+  void writeWarning(String text) => write(text, color: ConsoleColor.yellow);
+  void writeError(String text) => write(text, color: ConsoleColor.red);
+  void write(String text, {ConsoleColor color = ConsoleColor.white}) {
+    _output.write('$appId: $text', color: color);
+  }
 }
 
 class ConsoleOutput {
@@ -53,9 +49,12 @@ class ConsoleOutput {
 
   ConsoleOutput._(this._console, this._row);
 
-  void write(String text, {StatusColor color = StatusColor.info}) {
+  void write(String text, {ConsoleColor? color}) {
     _console.cursorPosition = Coordinate(_row, 0);
-    _console.setForegroundColor(color._color);
+    if (color != null) {
+      _console.setForegroundColor(color);
+    }
+    _console.eraseLine();
     _console.write(text);
   }
 }

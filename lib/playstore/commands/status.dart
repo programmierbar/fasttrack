@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:fasttrack/common/command.dart';
 import 'package:fasttrack/playstore/commands/command.dart';
 import 'package:fasttrack/playstore/config.dart';
 import 'package:googleapis/androidpublisher/v3.dart';
@@ -41,17 +40,17 @@ class PlayStoreStatusTask extends PlayStoreCommandTask {
   PlayStoreStatusTask({required this.version, required this.track});
 
   Future<void> run() async {
-    output.write('$appId:  loading...');
+    write('loading...');
 
-    final track = await resource.get(track: this.track);
+    final track = await api.get(track: this.track);
     final releases = track.releases;
 
     if (releases == null) {
-      output.write('$appId -> no releases', color: StatusColor.error);
+      writeError('no releases');
     } else if (version != null) {
       final release = releases.firstWhereOrNull((release) => release.name == version);
       if (release == null) {
-        output.write('$appId: $version -> not available', color: StatusColor.error);
+        writeError('$version -> not available');
       } else {
         _writeRelease(release);
       }
@@ -61,17 +60,17 @@ class PlayStoreStatusTask extends PlayStoreCommandTask {
   }
 
   void _writeRelease(TrackRelease release) {
-    final parts = [
-      '$appId:',
+    final text = [
       release.name,
       '(${release.versionCodes?.join(', ')})',
       '->',
       release.status,
       release.userFraction != null ? '(${(release.userFraction! * 100).round()}%)' : null,
-    ];
-    output.write(
-      parts.where((part) => part != null).join(' '),
-      color: release.status == 'inProgress' ? StatusColor.warning : StatusColor.success,
-    );
+    ].where((part) => part != null).join(' ');
+    if (release.status == 'inProgress') {
+      writeWarning(text);
+    } else {
+      writeSuccess(text);
+    }
   }
 }

@@ -19,8 +19,8 @@ class PlayStoreApiClient {
     _api = AndroidPublisherApi(_client);
   }
 
-  PlayStoreTrackResource getTrackResource({required String packageName}) {
-    return PlayStoreTrackResource._(_api, packageName);
+  PlayStoreTrackApi getTrackApi({required String packageName}) {
+    return PlayStoreTrackApi._(_api, packageName);
   }
 
   void close() {
@@ -28,12 +28,12 @@ class PlayStoreApiClient {
   }
 }
 
-class PlayStoreResource {
+class PlayStoreApi {
   final String packageName;
   final EditsResource _resource;
   AppEdit? _edit;
 
-  PlayStoreResource._(AndroidPublisherApi api, this.packageName) : _resource = api.edits;
+  PlayStoreApi._(AndroidPublisherApi api, this.packageName) : _resource = api.edits;
 
   Future<void> _begin() async {
     _edit ??= await _resource.insert(AppEdit(), packageName);
@@ -57,8 +57,8 @@ class PlayStoreResource {
   }
 }
 
-class PlayStoreTrackResource extends PlayStoreResource {
-  PlayStoreTrackResource._(AndroidPublisherApi api, String packageName) : super._(api, packageName);
+class PlayStoreTrackApi extends PlayStoreApi {
+  PlayStoreTrackApi._(AndroidPublisherApi api, String packageName) : super._(api, packageName);
 
   Future<Track> get({required String track}) async {
     await _begin();
