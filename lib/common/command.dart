@@ -1,7 +1,22 @@
+import 'dart:convert';
+
 import 'package:args/command_runner.dart' as args;
 import 'package:dart_console/dart_console.dart';
+import 'package:googleapis/abusiveexperiencereport/v1.dart';
 
 abstract class Command extends args.Command {
+  static const _dryRunFlag = 'dry-run';
+
+  Command() {
+    argParser.addFlag(
+      _dryRunFlag,
+      abbr: 'd',
+      help: 'Whether to only validate the promotion',
+    );
+  }
+
+  bool get dryRun => getParam(_dryRunFlag);
+
   T? getParam<T>(String name) => argResults?[name] as T?;
   Iterable<T>? getList<T>(String name) => (argResults?[name] as String?)?.split(',').cast<T>();
 
@@ -11,8 +26,8 @@ abstract class Command extends args.Command {
     final tasks = await setup();
 
     final console = Console();
-    for (final _ in tasks) {
-      console.writeLine();
+    for (final task in tasks) {
+      console.writeLine('${task.appId}: initializing...');
     }
     var line = console.cursorPosition!.row - tasks.length;
     for (final task in tasks) {
@@ -20,10 +35,24 @@ abstract class Command extends args.Command {
     }
     console.hideCursor();
 
-    await Future.wait(tasks.map((task) => task.run()));
+    await Future.wait(tasks.map(_runTask));
 
     console.showCursor();
     console.cursorPosition = Coordinate(line, 0);
+  }
+
+  Future<void> _runTask(CommandTask task) async {
+    try {
+      await task.run();
+    } on DetailedApiRequestError catch (error) {
+      task.error(error.toString());
+      print(jsonEncode(error.jsonResponse));
+      for (final part in error.errors) {
+        print(part);
+      }
+    } catch (error) {
+      task.error(error.toString());
+    }
   }
 }
 
@@ -35,10 +64,10 @@ abstract class CommandTask {
 
   Future<void> run();
 
-  void writeSuccess(String text) => write(text, color: ConsoleColor.green);
-  void writeWarning(String text) => write(text, color: ConsoleColor.yellow);
-  void writeError(String text) => write(text, color: ConsoleColor.red);
-  void write(String text, {ConsoleColor color = ConsoleColor.white}) {
+  void success(String text) => info(text, color: ConsoleColor.green);
+  void warning(String text) => info(text, color: ConsoleColor.yellow);
+  void error(String text) => info(text, color: ConsoleColor.red);
+  void info(String text, {ConsoleColor color = ConsoleColor.white}) {
     _output.write('$appId: $text', color: color);
   }
 }

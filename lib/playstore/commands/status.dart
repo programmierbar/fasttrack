@@ -12,12 +12,7 @@ class PlayStoreStatusCommand extends PlayStoreCommand {
 
   PlayStoreStatusCommand(PlayStoreConfig config) : super(config) {
     argParser.addOption(
-      _versionOption,
-      abbr: 'v',
-      help: 'The version to promote to the other track',
-    );
-    argParser.addOption(
-      'track',
+      _trackOption,
       abbr: 't',
       help: 'The track to get status information for',
       allowed: ['production', 'beta', 'alpha', 'internal'],
@@ -40,23 +35,25 @@ class PlayStoreStatusTask extends PlayStoreCommandTask {
   PlayStoreStatusTask({required this.version, required this.track});
 
   Future<void> run() async {
-    write('loading...');
+    info('loading...');
 
     final track = await api.get(track: this.track);
     final releases = track.releases;
 
     if (releases == null) {
-      writeError('no releases');
+      error('no releases');
     } else if (version != null) {
       final release = releases.firstWhereOrNull((release) => release.name == version);
       if (release == null) {
-        writeError('$version -> not available');
+        error('$version -> not available');
       } else {
         _writeRelease(release);
       }
     } else {
       _writeRelease(releases.first);
     }
+
+    await api.abort();
   }
 
   void _writeRelease(TrackRelease release) {
@@ -68,9 +65,9 @@ class PlayStoreStatusTask extends PlayStoreCommandTask {
       release.userFraction != null ? '(${(release.userFraction! * 100).round()}%)' : null,
     ].where((part) => part != null).join(' ');
     if (release.status == 'inProgress') {
-      writeWarning(text);
+      warning(text);
     } else {
-      writeSuccess(text);
+      success(text);
     }
   }
 }

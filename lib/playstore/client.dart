@@ -35,18 +35,17 @@ class PlayStoreApi {
 
   PlayStoreApi._(AndroidPublisherApi api, this.packageName) : _resource = api.edits;
 
-  Future<void> _begin() async {
+  Future<void> edit() async {
     _edit ??= await _resource.insert(AppEdit(), packageName);
   }
 
-  Future<void> validate() async {
+  Future<void> commit({bool validateOnly = false}) async {
     assert(_edit != null);
-    await _resource.validate(packageName, _edit!.id!);
-  }
-
-  Future<void> commit() async {
-    assert(_edit != null);
-    await _resource.commit(packageName, _edit!.id!);
+    if (validateOnly) {
+      await _resource.validate(packageName, _edit!.id!);
+    } else {
+      await _resource.commit(packageName, _edit!.id!);
+    }
     _edit = null;
   }
 
@@ -61,12 +60,12 @@ class PlayStoreTrackApi extends PlayStoreApi {
   PlayStoreTrackApi._(AndroidPublisherApi api, String packageName) : super._(api, packageName);
 
   Future<Track> get({required String track}) async {
-    await _begin();
+    await edit();
     return await _resource.tracks.get(packageName, _edit!.id!, track);
   }
 
   Future<void> update(Track track) async {
-    await _begin();
+    await edit();
     await _resource.tracks.update(track, packageName, _edit!.id!, track.track!);
   }
 }
