@@ -4,6 +4,32 @@ import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/appstore/connect_api/token.dart';
 import 'package:http/http.dart';
 
+class AppStoreConnectApi {
+  final AppStoreConnectClient _client;
+  final String _appId;
+
+  AppStoreConnectApi(this._client, this._appId);
+
+  Future<List<AppStoreVersion>> getVersions({
+    List<String>? versions,
+    List<AppStoreState>? states,
+  }) async {
+    final request = _Request('apps/$_appId/appStoreVersions') //
+      ..include('appStoreVersionPhasedRelease')
+      ..include('build');
+
+    if (versions != null) {
+      request.filter('versionString', versions);
+    }
+    if (states != null) {
+      request.filter('appStoreState', states);
+    }
+
+    final response = await _client._get(request);
+    return response.asList<AppStoreVersion>();
+  }
+}
+
 class AppStoreConnectClient {
   final AppStoreConnectTokenConfig _config;
   final Client _client = Client();
@@ -11,31 +37,6 @@ class AppStoreConnectClient {
   AppStoreConnectToken? _token;
 
   AppStoreConnectClient(this._config);
-
-  Future<List<App>> getApps({List<String>? bundleIds}) async {
-    final request = _Request('apps');
-    request.include(AppStoreVersion.type, fields: AppStoreVersion.fields, limit: 2);
-    if (bundleIds != null) {
-      request.filter('bundleId', bundleIds);
-    }
-
-    final response = await _get(request);
-    final apps = response.asList<App>();
-
-    return (bundleIds != null) //
-        ? apps.where((app) => bundleIds.contains(app.bundleId)).toList()
-        : apps;
-  }
-
-  Future<List<AppStoreVersion>> getVersions(String appId) async {
-    final request = _Request('apps/$appId/appStoreVersions') //
-      ..filter('appStoreState', AppStoreState.liveStates)
-      ..include('appStoreVersionPhasedRelease')
-      ..include('build');
-
-    final response = await _get(request);
-    return response.asList<AppStoreVersion>();
-  }
 
   Future<_Response> _get(_Request request) async {
     final uri = request.toUri();

@@ -7,8 +7,9 @@ import 'package:fasttrack/playstore/commands/update.dart';
 import 'package:fasttrack/playstore/config.dart';
 
 class PlayStoreCommandGroup extends args.Command {
-  final String name = "playstore";
-  final String description = "Bundles all play store related commands";
+  final String name = 'playstore';
+  final List<String> aliases = ['ps'];
+  final String description = 'Bundles all play store related commands';
 
   PlayStoreCommandGroup(PlayStoreConfig config) {
     addSubcommand(PlayStoreStatusCommand(config));

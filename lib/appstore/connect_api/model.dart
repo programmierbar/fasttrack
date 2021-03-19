@@ -175,7 +175,7 @@ class ReleaseType {
 class AppStoreVersionPhasedRelease extends Model {
   static const type = 'appStoreVersionPhasedReleases';
   static const fields = ['phasedReleaseState', 'totalPauseDuration', 'currentDayNumber'];
-  static const _userFractions = {1: 0.01, 2: 0.05, 3: 0.1, 4: 0.5, 5: 1.0};
+  static const _userFractions = {1: 0.01, 2: 0.02, 3: 0.05, 4: 0.1, 5: 0.2, 6: 0.5, 7: 1.0};
 
   final PhasedReleaseState state;
   final Duration pauseDuration;
@@ -183,7 +183,7 @@ class AppStoreVersionPhasedRelease extends Model {
 
   AppStoreVersionPhasedRelease._(String id, Map<String, dynamic> attributes)
       : state = enumfromString(PhasedReleaseState.values, (attributes['phasedReleaseState'] as String).toLowerCase()),
-        pauseDuration = Duration(seconds: attributes['totalPauseDuration']),
+        pauseDuration = Duration(days: attributes['totalPauseDuration']),
         dayNumber = attributes['currentDayNumber'],
         super._(id, type);
 

@@ -57,7 +57,7 @@ class PlayStorePromoteTask extends PlayStoreCommandTask {
   });
 
   Future<void> run() async {
-    info('${version ?? 'release'} promotion ${dryRun ? 'validation' : ''}');
+    log('${version ?? 'release'} promotion ${dryRun ? 'validation' : ''}');
 
     final fromTrack = await api.get(track: track);
     Iterable<TrackRelease>? releases = fromTrack.releases;

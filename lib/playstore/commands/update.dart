@@ -45,7 +45,7 @@ class PlayStoreUpdateTask extends PlayStoreCommandTask {
   });
 
   Future<void> run() async {
-    info('${version ?? 'release'} update ${dryRun ? 'validation' : ''}');
+    log('${version ?? 'release'} update ${dryRun ? 'validation' : ''}');
     final track = await api.get(track: this.track);
 
     final release = (version != null)
@@ -61,6 +61,7 @@ class PlayStoreUpdateTask extends PlayStoreCommandTask {
 
     if (rollout == 1) {
       release.status = 'completed';
+      release.userFraction = null;
     } else if (rollout > 0 && rollout < 1) {
       if (release.status == 'inProgress' && release.userFraction == rollout) {
         return warning('${release.name} is already at ${rollout * 100}% rollout');
@@ -72,6 +73,7 @@ class PlayStoreUpdateTask extends PlayStoreCommandTask {
         return warning('${release.name} is already halted');
       }
       release.status = 'halted';
+      release.userFraction = null;
     }
 
     track.releases = [release];

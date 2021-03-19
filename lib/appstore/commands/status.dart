@@ -1,33 +1,63 @@
 import 'package:fasttrack/appstore/commands/command.dart';
-import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
+import 'package:fasttrack/common/command.dart';
 
 class AppStoreStatusCommand extends AppStoreCommand {
   final name = 'status';
   final description = 'Get the status of all app versions';
 
-  AppStoreStatusCommand(AppStoreConfig config) : super(config);
+  AppStoreCommandTask setupTask() {
+    return AppStoreStatusTask(version);
+  }
+}
+
+class AppStoreStatusTask extends AppStoreCommandTask {
+  final String? version;
+
+  AppStoreStatusTask(this.version);
 
   Future<void> run() async {
-    final versions = Map.fromIterables(
-      config.appIds.keys,
-      await Future.wait(config.appIds.values.map((id) => client.getVersions(id))),
-    );
+    log('loading...');
 
-    for (final entry in versions.entries) {
-      for (final version in entry.value) {
-        final parts = <dynamic?>[
-          '${entry.key}:',
-          version.name,
-          if (version.build != null) //
-            '(${version.build?.version})',
-          '->',
-          version.state,
-          if (version.phasedRelease != null) //
-            ...[enumToString(version.phasedRelease!.state), version.phasedRelease!.userFraction]
-        ];
-        print(parts.where((part) => part != null).join(' '));
+    final versions = await api.getVersions(
+        versions: version != null ? [version!] : null, states: version == null ? AppStoreState.liveStates : null);
+
+    if (versions.isEmpty) {
+      return error(version == null ? 'no version available' : '$version not available');
+    }
+
+    _print(versions.first);
+  }
+
+  void _print(AppStoreVersion version) {
+    var color = StatusColor.info;
+    final parts = [version.name];
+    if (version.build != null) {
+      parts.add('(${version.build!.version})');
+    }
+    if (version.state != AppStoreState.readyForSale) {
+      parts.add(version.state.toString().toLowerCase());
+      color = StatusColor.warning;
+    } else {
+      final release = version.phasedRelease;
+      if (release == null) {
+        parts.add('completed');
+        color = StatusColor.success;
+      } else {
+        if (release.state == PhasedReleaseState.complete) {
+          parts.add('completed');
+          color = StatusColor.success;
+        } else if (release.state == PhasedReleaseState.active) {
+          parts.add('inProgress (${(release.userFraction * 100).round()}%)');
+          color = StatusColor.warning;
+        } else if (release.state == PhasedReleaseState.paused) {
+          parts.add('halted (${release.pauseDuration.inDays} days)');
+          color = StatusColor.warning;
+        } else {
+          parts.add(enumToString(release.state));
+        }
       }
     }
+    log(parts.join(' '), color: color);
   }
 }

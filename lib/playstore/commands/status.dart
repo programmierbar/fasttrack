@@ -35,7 +35,7 @@ class PlayStoreStatusTask extends PlayStoreCommandTask {
   PlayStoreStatusTask({required this.version, required this.track});
 
   Future<void> run() async {
-    info('loading...');
+    log('loading...');
 
     final track = await api.get(track: this.track);
     final releases = track.releases;
@@ -45,7 +45,7 @@ class PlayStoreStatusTask extends PlayStoreCommandTask {
     } else if (version != null) {
       final release = releases.firstWhereOrNull((release) => release.name == version);
       if (release == null) {
-        error('$version -> not available');
+        error('$version not available');
       } else {
         _writeRelease(release);
       }
@@ -60,7 +60,6 @@ class PlayStoreStatusTask extends PlayStoreCommandTask {
     final text = [
       release.name,
       '(${release.versionCodes?.join(', ')})',
-      '->',
       release.status,
       release.userFraction != null ? '(${(release.userFraction! * 100).round()}%)' : null,
     ].where((part) => part != null).join(' ');

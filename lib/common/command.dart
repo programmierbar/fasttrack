@@ -64,10 +64,10 @@ abstract class CommandTask {
 
   Future<void> run();
 
-  void success(String text) => info(text, color: ConsoleColor.green);
-  void warning(String text) => info(text, color: ConsoleColor.yellow);
-  void error(String text) => info(text, color: ConsoleColor.red);
-  void info(String text, {ConsoleColor color = ConsoleColor.white}) {
+  void success(String text) => log(text, color: StatusColor.success);
+  void warning(String text) => log(text, color: StatusColor.warning);
+  void error(String text) => log(text, color: StatusColor.error);
+  void log(String text, {StatusColor color = StatusColor.info}) {
     _output.write('$appId: $text', color: color);
   }
 }
@@ -78,12 +78,22 @@ class ConsoleOutput {
 
   ConsoleOutput._(this._console, this._row);
 
-  void write(String text, {ConsoleColor? color}) {
+  void write(String text, {StatusColor? color}) {
     _console.cursorPosition = Coordinate(_row, 0);
     if (color != null) {
-      _console.setForegroundColor(color);
+      _console.setForegroundColor(color._color);
     }
     _console.eraseLine();
     _console.write(text);
   }
+}
+
+class StatusColor {
+  static const info = StatusColor._(ConsoleColor.white);
+  static const success = StatusColor._(ConsoleColor.green);
+  static const warning = StatusColor._(ConsoleColor.yellow);
+  static const error = StatusColor._(ConsoleColor.red);
+
+  final ConsoleColor _color;
+  const StatusColor._(this._color);
 }
