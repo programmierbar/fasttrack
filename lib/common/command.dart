@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:args/command_runner.dart' as args;
 import 'package:dart_console/dart_console.dart';
-import 'package:googleapis/abusiveexperiencereport/v1.dart';
 
 abstract class Command extends args.Command {
   static const _dryRunFlag = 'dry-run';
@@ -29,7 +26,8 @@ abstract class Command extends args.Command {
     for (final task in tasks) {
       console.writeLine('${task.appId}: initializing...');
     }
-    var line = console.cursorPosition!.row - tasks.length;
+    var line = 0;
+    //var line = console.cursorPosition!.row - tasks.length;
     for (final task in tasks) {
       task._output = ConsoleOutput._(console, line++);
     }
@@ -44,12 +42,8 @@ abstract class Command extends args.Command {
   Future<void> _runTask(CommandTask task) async {
     try {
       await task.run();
-    } on DetailedApiRequestError catch (error) {
-      task.error(error.toString());
-      print(jsonEncode(error.jsonResponse));
-      for (final part in error.errors) {
-        print(part);
-      }
+    } on TaskException catch (error) {
+      task.error(error.message);
     } catch (error) {
       task.error(error.toString());
     }
@@ -70,6 +64,11 @@ abstract class CommandTask {
   void log(String text, {StatusColor color = StatusColor.info}) {
     _output.write('$appId: $text', color: color);
   }
+}
+
+class TaskException implements Exception {
+  final String message;
+  TaskException(this.message);
 }
 
 class ConsoleOutput {

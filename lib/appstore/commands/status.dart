@@ -1,6 +1,7 @@
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/common/command.dart';
+import 'package:fasttrack/common/extension.dart';
 
 class AppStoreStatusCommand extends AppStoreCommand {
   final name = 'status';
@@ -20,7 +21,9 @@ class AppStoreStatusTask extends AppStoreCommandTask {
     log('loading...');
 
     final versions = await api.getVersions(
-        versions: version != null ? [version!] : null, states: version == null ? AppStoreState.liveStates : null);
+      versions: version != null ? [version!] : null,
+      states: version == null ? AppStoreState.liveStates : null,
+    );
 
     if (versions.isEmpty) {
       return error(version == null ? 'no version available' : '$version not available');
@@ -31,12 +34,12 @@ class AppStoreStatusTask extends AppStoreCommandTask {
 
   void _print(AppStoreVersion version) {
     var color = StatusColor.info;
-    final parts = [version.name];
+    final parts = [version.versionString];
     if (version.build != null) {
       parts.add('(${version.build!.version})');
     }
-    if (version.state != AppStoreState.readyForSale) {
-      parts.add(version.state.toString().toLowerCase());
+    if (version.appStoreState != AppStoreState.readyForSale) {
+      parts.add(version.appStoreState.toString().toLowerCase());
       color = StatusColor.warning;
     } else {
       final release = version.phasedRelease;
@@ -44,17 +47,17 @@ class AppStoreStatusTask extends AppStoreCommandTask {
         parts.add('completed');
         color = StatusColor.success;
       } else {
-        if (release.state == PhasedReleaseState.complete) {
+        if (release.phasedReleaseState == PhasedReleaseState.complete) {
           parts.add('completed');
           color = StatusColor.success;
-        } else if (release.state == PhasedReleaseState.active) {
+        } else if (release.phasedReleaseState == PhasedReleaseState.active) {
           parts.add('inProgress (${(release.userFraction * 100).round()}%)');
           color = StatusColor.warning;
-        } else if (release.state == PhasedReleaseState.paused) {
-          parts.add('halted (${release.pauseDuration.inDays} days)');
+        } else if (release.phasedReleaseState == PhasedReleaseState.paused) {
+          parts.add('halted (${release.totalPauseDuration.inDays} days)');
           color = StatusColor.warning;
         } else {
-          parts.add(enumToString(release.state));
+          parts.add(enumToString(release.phasedReleaseState));
         }
       }
     }

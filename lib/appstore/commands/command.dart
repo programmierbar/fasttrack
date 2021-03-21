@@ -1,22 +1,31 @@
 import 'package:args/command_runner.dart' as args;
+import 'package:fasttrack/appstore/commands/create.dart';
 import 'package:fasttrack/appstore/commands/status.dart';
 import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/client.dart';
 import 'package:fasttrack/common/command.dart';
+import 'package:fasttrack/common/config.dart';
+import 'package:fasttrack/common/metadata.dart';
 
 class AppStoreCommandGroup extends args.Command {
   final String name = 'appstore';
   final List<String> aliases = ['as'];
   final String description = 'Bundles all AppStore related commands';
 
-  AppStoreCommandGroup(AppStoreConfig config) {
-    final client = AppStoreConnectClient(config);
+  AppStoreCommandGroup(StoreConfig config) {
+    final client = AppStoreConnectClient(config.appStore!);
+    final loader = ReleaseNotesLoader(
+      path: config.metadata!.dir,
+      filePrefix: config.metadata!.filePrefix,
+    );
+
     final commands = [
       AppStoreStatusCommand(),
+      AppStoreCreateCommand(loader),
     ];
 
     for (final command in commands) {
-      command.config = config;
+      command.config = config.appStore!;
       command.client = client;
       addSubcommand(command);
     }

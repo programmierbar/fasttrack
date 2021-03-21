@@ -10,6 +10,7 @@ import 'package:fasttrack/playstore/commands/command.dart';
 import 'package:fasttrack/playstore/config.dart';
 
 const config = StoreConfig(
+  metadata: MetadataConfig(dir: './metadata'),
   appStore: AppStoreConfig(
     keyId: '47KUQ5A2CF',
     issuerId: '69a6de6f-9699-47e3-e053-5b8c7c11a4d1',
@@ -43,7 +44,7 @@ const config = StoreConfig(
 Future<void> main(List<String> args) async {
   final runner = CommandRunner('fasttrack', 'Forget crappy fastlane, here comes fasttrack!!!');
   if (config.appStore != null) {
-    runner.addCommand(AppStoreCommandGroup(config.appStore!));
+    runner.addCommand(AppStoreCommandGroup(config));
   }
   if (config.playStore != null) {
     runner.addCommand(PlayStoreCommandGroup(config.playStore!));

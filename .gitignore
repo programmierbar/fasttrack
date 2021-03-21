@@ -9,6 +9,7 @@
 # Conventional directory for build outputs
 build/
 credentials/
+metadata/
 
 # Directory created by dartdoc
 doc/api/
