@@ -1,6 +1,7 @@
 import 'package:args/command_runner.dart' as args;
 import 'package:fasttrack/appstore/commands/create.dart';
 import 'package:fasttrack/appstore/commands/status.dart';
+import 'package:fasttrack/appstore/commands/submit.dart';
 import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/client.dart';
 import 'package:fasttrack/common/command.dart';
@@ -22,6 +23,7 @@ class AppStoreCommandGroup extends args.Command {
     final commands = [
       AppStoreStatusCommand(),
       AppStoreCreateCommand(loader),
+      AppStoreSubmitCommand(),
     ];
 
     for (final command in commands) {

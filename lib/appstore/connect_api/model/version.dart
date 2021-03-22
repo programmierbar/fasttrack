@@ -30,16 +30,8 @@ class AppStoreVersion extends ApiModel {
   bool get live => AppStoreState.liveStates.contains(appStoreState);
   bool get editable => AppStoreState.editStates.contains(appStoreState);
 
-  Future<AppStoreVersion> update(AppStoreVersionAttributes attributes) async {
-    final response = await client.patch(
-      'appStoreVersions/$id',
-      {
-        'type': 'appStoreVersions',
-        'id': id,
-        'attributes': attributes.toMap()..removeWhere((_, value) => value == null),
-      },
-    );
-    return response.as<AppStoreVersion>();
+  Future<AppStoreVersion> update(AppStoreVersionAttributes attributes) {
+    return client.patchAttributes(type: 'appStoreVersions', id: id, attributes: attributes);
   }
 
   Future<List<AppStoreVersionLocalization>> getLocalizations() async {
@@ -47,15 +39,28 @@ class AppStoreVersion extends ApiModel {
     final response = await client.get(request);
     return response.asList<AppStoreVersionLocalization>();
   }
+
+  Future<AppStoreVersion> attachBuild(Build build) async {
+    final response = await client.patch('appStoreVersions/$id', {
+      'type': 'appStoreVersions',
+      'id': id,
+      'relationships': {
+        'build': {
+          'data': {'type': 'builds', 'id': build.id}
+        }
+      }
+    });
+    return response.as<AppStoreVersion>();
+  }
 }
 
-class AppStoreVersionAttributes {
+class AppStoreVersionAttributes implements ModelAttributes {
   final String? versionString;
   final AppStorePlatform? platform;
 
   const AppStoreVersionAttributes({this.versionString, this.platform});
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic?> toMap() {
     return {
       'versionString': versionString,
       'platform': platform.toString(),

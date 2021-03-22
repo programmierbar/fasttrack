@@ -12,6 +12,9 @@ class Build extends Model {
         processingState =
             enumfromString(ProcessingState.values, (attributes['processingState'] as String).toLowerCase()),
         super(type, id);
+
+  bool get valid => processingState == ProcessingState.valid;
+  bool get processed => processingState != ProcessingState.processing;
 }
 
 enum ProcessingState {

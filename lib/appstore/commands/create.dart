@@ -5,7 +5,7 @@ import 'package:fasttrack/common/metadata.dart';
 
 class AppStoreCreateCommand extends AppStoreCommand {
   final name = 'create';
-  final description = 'Create a new app version';
+  final description = 'Create and manage new app store version';
 
   final ReleaseNotesLoader loader;
 

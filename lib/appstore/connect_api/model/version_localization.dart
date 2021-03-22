@@ -14,7 +14,7 @@ class AppStoreVersionLocalization extends ApiModel {
         super(type, id, client);
 
   Future<AppStoreVersionLocalization> update(AppStoreVersionLocalizationAttributes attributes) async {
-    return client.patchModel(type: 'appStoreVersionLocalizations', id: id, attributes: attributes);
+    return client.patchAttributes(type: 'appStoreVersionLocalizations', id: id, attributes: attributes);
   }
 }
 
@@ -24,6 +24,8 @@ class AppStoreVersionLocalizationAttributes implements ModelAttributes {
   AppStoreVersionLocalizationAttributes({this.whatsNew});
 
   Map<String, dynamic?> toMap() {
-    return {'whatsNew': whatsNew};
+    return {
+      'whatsNew': whatsNew,
+    };
   }
 }

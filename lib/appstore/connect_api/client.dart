@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fasttrack/appstore/connect_api/model/build.dart';
 import 'package:fasttrack/appstore/connect_api/model/model.dart';
 import 'package:fasttrack/appstore/connect_api/model/version.dart';
 import 'package:fasttrack/appstore/connect_api/token.dart';
@@ -56,6 +57,21 @@ class AppStoreConnectApi {
     );
     return response.as<AppStoreVersion>();
   }
+
+  Future<List<Build>> getBuilds({required String version, String? buildNumber}) async {
+    final request = GetRequest('builds') //
+      ..filter('app', appId)
+      ..filter('preReleaseVersion.version', version)
+      ..filter('processingState', ['PROCESSING', 'FAILED', 'INVALID', 'VALID'])
+      ..sort('uploadedDate', descending: true);
+
+    if (buildNumber != null) {
+      request.filter('version', buildNumber);
+    }
+
+    final response = await _client.get(request);
+    return response.asList<Build>();
+  }
 }
 
 class AppStoreConnectClient {
@@ -73,7 +89,7 @@ class AppStoreConnectClient {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${token.value}',
     });
-    //print('Received response ${response.body}');
+    print('Get response ${response.body}');
 
     return ApiResponse(this, response);
   }
@@ -100,7 +116,7 @@ class AppStoreConnectClient {
     return ApiResponse(this, response);
   }
 
-  Future<T> patchModel<T extends Model>({
+  Future<T> patchAttributes<T extends Model>({
     required String type,
     required String id,
     required ModelAttributes attributes,
@@ -136,11 +152,12 @@ class GetRequest {
   final Set<String> _includes = {};
   final Map<String, String> _fields = {};
   final Map<String, int> _limits = {};
+  final Map<String, bool> _sort = {};
 
   GetRequest(this._path);
 
-  void filter(String name, dynamic value) {
-    _filters[name] = value is List ? value.map((item) => item.toString()).join(',') : value;
+  void filter(String field, dynamic value) {
+    _filters[field] = value is List ? value.map((item) => item.toString()).join(',') : value;
   }
 
   void include(String type, {List<String>? fields, int? limit}) {
@@ -153,6 +170,10 @@ class GetRequest {
     }
   }
 
+  void sort(String field, {bool descending = false}) {
+    _sort[field] = descending;
+  }
+
   Uri toUri() {
     final params = <String, dynamic>{
       for (final filter in _filters.entries) //
@@ -162,7 +183,9 @@ class GetRequest {
       for (final fields in _fields.entries) //
         'fields[${fields.key}]': fields.value,
       for (final limit in _limits.entries) //
-        'limit[${limit.key}]': limit.value.toString()
+        'limit[${limit.key}]': limit.value.toString(),
+      if (_sort.isNotEmpty) //
+        'sort': _sort.entries.map((entry) => '${entry.value ? '-' : ''}${entry.key}').join(',')
     };
 
     return Uri.parse(_apiUri + _path).replace(queryParameters: params);

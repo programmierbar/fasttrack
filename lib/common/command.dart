@@ -61,9 +61,7 @@ abstract class CommandTask {
   void success(String text) => log(text, color: StatusColor.success);
   void warning(String text) => log(text, color: StatusColor.warning);
   void error(String text) => log(text, color: StatusColor.error);
-  void log(String text, {StatusColor color = StatusColor.info}) {
-    _output.write('$appId: $text', color: color);
-  }
+  void log(String text, {StatusColor color = StatusColor.info}) => _output.write('$appId: $text', color: color);
 }
 
 class TaskException implements Exception {
