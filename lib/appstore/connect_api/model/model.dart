@@ -3,6 +3,7 @@ import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/appstore/connect_api/model/build.dart';
 import 'package:fasttrack/appstore/connect_api/model/phased_release.dart';
 import 'package:fasttrack/appstore/connect_api/model/version.dart';
+import 'package:fasttrack/appstore/connect_api/model/version_submission.dart';
 
 abstract class Model {
   final String _type;
@@ -23,7 +24,9 @@ abstract class Model {
       case AppStoreVersionLocalization.type:
         return AppStoreVersionLocalization(id, client, attributes);
       case AppStoreVersionPhasedRelease.type:
-        return AppStoreVersionPhasedRelease(id, attributes);
+        return AppStoreVersionPhasedRelease(id, client, attributes);
+      case AppStoreVersionSubmission.type:
+        return AppStoreVersionSubmission(id, client, attributes);
       case Build.type:
         return Build(id, attributes);
       default:
@@ -32,10 +35,10 @@ abstract class Model {
   }
 }
 
-abstract class ApiModel extends Model {
+abstract class CallableModel extends Model {
   final AppStoreConnectClient client;
 
-  ApiModel(String type, String id, this.client) : super(type, id);
+  CallableModel(String type, String id, this.client) : super(type, id);
 }
 
 abstract class ModelAttributes {
@@ -77,7 +80,7 @@ class ModelParser {
   ) {
     final type = data['type'] as String;
     final id = data['id'] as String;
-    final attributes = data['attributes'] as Map<String, dynamic>;
+    final attributes = data['attributes'] as Map<String, dynamic>? ?? <String, dynamic>{};
     final relations = data.containsKey('relationships')
         ? _parseRelations(data['relationships'] as Map<String, dynamic>, includes)
         : <String, dynamic>{};

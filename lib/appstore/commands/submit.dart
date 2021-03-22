@@ -3,6 +3,7 @@
 import 'package:collection/collection.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
+import 'package:fasttrack/appstore/connect_api/model/phased_release.dart';
 import 'package:fasttrack/common/command.dart';
 import 'package:fasttrack/common/extension.dart';
 
@@ -10,6 +11,7 @@ class AppStoreSubmitCommand extends AppStoreCommand {
   static const _buildOption = 'build';
   static const _manualFlag = 'manual';
   static const _phasedFlag = 'phased';
+  static const _rejectFlag = 'reject';
 
   final name = 'submit';
   final description = 'Submit a app store version for review';
@@ -29,16 +31,18 @@ class AppStoreSubmitCommand extends AppStoreCommand {
       _phasedFlag,
       abbr: 'p',
       help: 'Whether to do a phased release for the app store version',
+      defaultsTo: true,
     );
+    argParser.addFlag(_rejectFlag, abbr: 'r', help: 'Whether to reject the current version submission');
   }
 
   AppStoreCommandTask setupTask() {
     return AppStoreSubmitTask(
-      version: version,
-      build: getParam(_buildOption),
-      manual: getParam(_manualFlag),
-      phased: getParam(_phasedFlag),
-    );
+        version: version,
+        build: getParam(_buildOption),
+        manual: getParam(_manualFlag),
+        phased: getParam(_phasedFlag),
+        reject: getParam(_rejectFlag));
   }
 }
 
@@ -49,24 +53,51 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
   final String? build;
   final bool manual;
   final bool phased;
+  final bool reject;
 
-  AppStoreSubmitTask({
-    required this.version,
-    required this.build,
-    required this.manual,
-    required this.phased,
-  });
+  AppStoreSubmitTask(
+      {required this.version, required this.build, required this.manual, required this.phased, required this.reject});
 
   Future<void> run() async {
-    final version = await _getVersion();
+    var version = await _getVersion();
 
-    final build = await _getBuild(version.versionString);
-    if (!build.valid) {
-      throw TaskException('The requested build is ${enumToString(build.processingState)}');
+    final releaseType = manual ? ReleaseType.manual : ReleaseType.afterApproval;
+    if (version.releaseType != releaseType) {
+      version = await version.update(AppStoreVersionAttributes(releaseType: releaseType));
+      log('updating release type $releaseType');
     }
 
-    await version.attachBuild(build);
-    final temp = true;
+    var phasedRelease = version.phasedRelease;
+    if (phased && phasedRelease == null) {
+      phasedRelease = await version.addPhasedRelease(AppStoreVersionPhasedReleaseAttributes(
+        phasedReleaseState: PhasedReleaseState.inactive,
+      ));
+      log('added phased release');
+    } else if (!phased && phasedRelease != null) {
+      await phasedRelease.delete();
+      log('removed phased release');
+    }
+
+    var build = version.build;
+    if (build == null) {
+      build = await _getBuild(version.versionString);
+      if (!build.valid) {
+        throw TaskException('The requested build is ${enumToString(build.processingState)}');
+      }
+      await version.addBuild(build);
+    }
+
+    var submission = version.submission;
+    if (!reject && submission == null) {
+      submission = await version.addSubmission();
+      success('${version.versionString} (${build.version}submitted for app review');
+    } else if (submission != null) {
+      if (!submission.canReject) {
+        throw TaskException('${version.versionString} can not be unsubmitted anymore');
+      }
+      await submission.delete();
+      success('${version.versionString} successfully unsubmitted');
+    }
   }
 
   Future<AppStoreVersion> _getVersion() async {

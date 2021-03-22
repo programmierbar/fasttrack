@@ -3,8 +3,9 @@ import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/appstore/connect_api/model/build.dart';
 import 'package:fasttrack/appstore/connect_api/model/model.dart';
 import 'package:fasttrack/appstore/connect_api/model/phased_release.dart';
+import 'package:fasttrack/appstore/connect_api/model/version_submission.dart';
 
-class AppStoreVersion extends ApiModel {
+class AppStoreVersion extends CallableModel {
   static const type = 'appStoreVersions';
   static const fields = ['versionString', 'appStoreState', 'releaseType'];
 
@@ -12,8 +13,9 @@ class AppStoreVersion extends ApiModel {
   final AppStoreState appStoreState;
   final ReleaseType releaseType;
 
-  final AppStoreVersionPhasedRelease? phasedRelease;
   final Build? build;
+  final AppStoreVersionPhasedRelease? phasedRelease;
+  final AppStoreVersionSubmission? submission;
 
   AppStoreVersion(
     String id,
@@ -23,8 +25,9 @@ class AppStoreVersion extends ApiModel {
   )   : versionString = attributes['versionString'],
         appStoreState = AppStoreState._(attributes['appStoreState']),
         releaseType = ReleaseType._(attributes['releaseType']),
-        phasedRelease = relations['appStoreVersionPhasedRelease'] as AppStoreVersionPhasedRelease?,
         build = relations['build'] as Build?,
+        phasedRelease = relations['appStoreVersionPhasedRelease'] as AppStoreVersionPhasedRelease?,
+        submission = relations['appStoreVersionSubmission'] as AppStoreVersionSubmission?,
         super(type, id, client);
 
   bool get live => AppStoreState.liveStates.contains(appStoreState);
@@ -40,7 +43,26 @@ class AppStoreVersion extends ApiModel {
     return response.asList<AppStoreVersionLocalization>();
   }
 
-  Future<AppStoreVersion> attachBuild(Build build) async {
+  /*Future<AppStoreVersionPhasedRelease?> getPhasedRelease() async {
+    final request = GetRequest('appStoreVersions/$id/appStoreVersionPhasedRelease');
+    final response = await client.get(request);
+    return response.as<AppStoreVersionPhasedRelease>();
+  }*/
+
+  Future<AppStoreVersionPhasedRelease> addPhasedRelease(AppStoreVersionPhasedReleaseAttributes attributes) async {
+    final response = await client.post('appStoreVersionPhasedReleases', {
+      'type': 'appStoreVersionPhasedReleases',
+      'attributes': attributes.toMap()..removeWhere((_, value) => value == null),
+      'relationships': {
+        'appStoreVersion': {
+          'data': {'type': 'appStoreVersions', 'id': id}
+        }
+      }
+    });
+    return response.as<AppStoreVersionPhasedRelease>();
+  }
+
+  Future<AppStoreVersion> addBuild(Build build) async {
     final response = await client.patch('appStoreVersions/$id', {
       'type': 'appStoreVersions',
       'id': id,
@@ -52,18 +74,39 @@ class AppStoreVersion extends ApiModel {
     });
     return response.as<AppStoreVersion>();
   }
+
+  Future<AppStoreVersionSubmission> addSubmission() async {
+    final response = await client.post(AppStoreVersionSubmission.type, {
+      'type': AppStoreVersionSubmission.type,
+      'relationships': {
+        'appStoreVersion': {
+          'data': {
+            'type': AppStoreVersion.type,
+            'id': id,
+          }
+        }
+      }
+    });
+    return response.as<AppStoreVersionSubmission>();
+  }
 }
 
 class AppStoreVersionAttributes implements ModelAttributes {
   final String? versionString;
   final AppStorePlatform? platform;
+  final ReleaseType? releaseType;
 
-  const AppStoreVersionAttributes({this.versionString, this.platform});
+  const AppStoreVersionAttributes({
+    this.versionString,
+    this.platform,
+    this.releaseType,
+  });
 
   Map<String, dynamic?> toMap() {
     return {
       'versionString': versionString,
-      'platform': platform.toString(),
+      'platform': platform?.toString(),
+      'releaseType': releaseType?.toString(),
     };
   }
 }

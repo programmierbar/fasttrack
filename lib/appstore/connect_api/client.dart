@@ -21,6 +21,7 @@ class AppStoreConnectApi {
   }) async {
     final request = GetRequest('apps/$appId/appStoreVersions') //
       ..include('appStoreVersionPhasedRelease')
+      ..include('appStoreVersionSubmission')
       ..include('build');
 
     if (versions != null) {
@@ -89,30 +90,30 @@ class AppStoreConnectClient {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ${token.value}',
     });
-    print('Get response ${response.body}');
+    //print('Get response ${response.body}');
 
     return ApiResponse(this, response);
   }
 
   Future<ApiResponse> post(String path, Map<String, dynamic> data) async {
     final response = await _client.post(
-      Uri.parse(_apiUri + path),
+      _getUri(path),
       headers: await _getHeaders(),
       body: jsonEncode({'data': data}),
     );
 
-    print('Post response ${response.body}');
+    //print('Post response ${response.body}');
     return ApiResponse(this, response);
   }
 
   Future<ApiResponse> patch(String path, Map<String, dynamic> data) async {
     final response = await _client.patch(
-      Uri.parse(_apiUri + path),
+      _getUri(path),
       headers: await _getHeaders(),
       body: jsonEncode({'data': data}),
     );
 
-    print('Patch response ${response.body}');
+    //print('Patch response ${response.body}');
     return ApiResponse(this, response);
   }
 
@@ -128,6 +129,15 @@ class AppStoreConnectClient {
     });
     return response.as<T>();
   }
+
+  Future<void> delete(String path) async {
+    await _client.delete(
+      _getUri(path),
+      headers: await _getHeaders(),
+    );
+  }
+
+  Uri _getUri(String path) => Uri.parse(_apiUri + path);
 
   Future<Map<String, String>> _getHeaders() async {
     final token = await _getToken();

@@ -12,7 +12,7 @@ class AppStoreCreateCommand extends AppStoreCommand {
   AppStoreCreateCommand(this.loader);
 
   AppStoreCommandTask setupTask() {
-    return AppStoreCreateTask(loader, version);
+    return AppStoreCreateTask(loader: loader, version: version);
   }
 }
 
@@ -20,7 +20,10 @@ class AppStoreCreateTask extends AppStoreCommandTask {
   final ReleaseNotesLoader loader;
   final String? version;
 
-  AppStoreCreateTask(this.loader, this.version);
+  AppStoreCreateTask({
+    required this.loader,
+    required this.version,
+  });
 
   Future<void> run() async {
     final version = await _ensureVersion();

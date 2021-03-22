@@ -1,7 +1,7 @@
 import 'package:fasttrack/appstore/connect_api/client.dart';
 import 'package:fasttrack/appstore/connect_api/model/model.dart';
 
-class AppStoreVersionLocalization extends ApiModel {
+class AppStoreVersionLocalization extends CallableModel {
   static const type = 'appStoreVersionLocalizations';
   static const fields = ['whatsNew'];
 
