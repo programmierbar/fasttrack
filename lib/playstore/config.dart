@@ -1,22 +1,28 @@
-class PlayStoreReleaseConfig {
-  final double userFraction;
+import 'package:yaml/yaml.dart';
 
-  const PlayStoreReleaseConfig({this.userFraction = 0.1});
-  PlayStoreReleaseConfig.fromMap(Map<String, dynamic> map, [PlayStoreReleaseConfig? base])
-      : userFraction = map['userFraction'] ?? base?.userFraction ?? 0.1;
+class PlayStoreReleaseConfig {
+  final double rollout;
+
+  const PlayStoreReleaseConfig({this.rollout = 1});
+  PlayStoreReleaseConfig.fromYaml(YamlMap map, [PlayStoreReleaseConfig? base])
+      : rollout = map['rollout'] ?? base?.rollout ?? 1;
 }
 
 class PlayStoreAppConfig extends PlayStoreReleaseConfig {
   final String id;
-  final String packageName;
+  final String appId;
 
-  const PlayStoreAppConfig({required this.id, required this.packageName, double userFraction = 0.1})
-      : super(userFraction: userFraction);
+  const PlayStoreAppConfig({required this.id, required this.appId, double rollout = 1}) : super(rollout: rollout);
 
-  PlayStoreAppConfig.fromMap(Map<String, dynamic> map, [PlayStoreReleaseConfig? base])
-      : id = map['id'],
-        packageName = map['packageName'],
-        super.fromMap(map, base);
+  factory PlayStoreAppConfig.fromYaml(String id, dynamic data, [PlayStoreReleaseConfig? release]) {
+    if (data is Map) {
+      return PlayStoreAppConfig(id: id, appId: data['appId'], rollout: data['rollout'] ?? release?.rollout ?? 1);
+    } else if (data is String) {
+      return PlayStoreAppConfig(id: id, appId: data, rollout: release?.rollout ?? 1);
+    } else {
+      throw Exception('The data for an play store app is not an app id oder map');
+    }
+  }
 }
 
 class PlayStoreConfig extends PlayStoreReleaseConfig {
@@ -25,22 +31,18 @@ class PlayStoreConfig extends PlayStoreReleaseConfig {
 
   const PlayStoreConfig({
     required this.keyFile,
-    double userFraction = 0.1,
+    double rollout = 1,
     required this.apps,
-  }) : super(userFraction: userFraction);
+  }) : super(rollout: rollout);
 
-  PlayStoreConfig.fromPackageNames({
-    required this.keyFile,
-    double userFraction = 0.1,
-    required Map<String, String> packageNames,
-  }) : apps = packageNames.entries.map((entry) => PlayStoreAppConfig(id: entry.key, packageName: entry.value)).toList();
-
-  factory PlayStoreConfig.fromMap(Map<String, dynamic> map) {
-    final release = PlayStoreReleaseConfig.fromMap(map);
+  factory PlayStoreConfig.fromYaml(YamlMap yaml) {
+    final release = PlayStoreReleaseConfig.fromYaml(yaml);
     return PlayStoreConfig(
-      keyFile: map['keyFile'],
-      userFraction: release.userFraction,
-      apps: (map['apps'] as List).map((item) => PlayStoreAppConfig.fromMap(map, release)).toList(),
+      keyFile: yaml['keyFile'],
+      rollout: release.rollout,
+      apps: (yaml['apps'] as Map).entries.map((entry) {
+        return PlayStoreAppConfig.fromYaml(entry.key, entry.value, release);
+      }).toList(),
     );
   }
 

@@ -1,3 +1,5 @@
+import 'package:yaml/yaml.dart';
+
 class AppStoreReleaseConfig {
   final bool phased;
   final bool manual;
@@ -7,9 +9,9 @@ class AppStoreReleaseConfig {
     this.manual = false,
   });
 
-  AppStoreReleaseConfig.fromMap(Map<String, dynamic> map, [AppStoreReleaseConfig? base])
-      : phased = map['phased'] ?? base?.phased ?? true,
-        manual = map['manual'] ?? base?.manual ?? false;
+  AppStoreReleaseConfig.fromYaml(YamlMap map)
+      : phased = map['phased'] ?? true,
+        manual = map['manual'] ?? false;
 }
 
 class AppStoreAppConfig extends AppStoreReleaseConfig {
@@ -21,12 +23,27 @@ class AppStoreAppConfig extends AppStoreReleaseConfig {
     required this.appId,
     bool phased = true,
     bool manual = false,
-  });
+  }) : super(phased: phased, manual: manual);
 
-  AppStoreAppConfig.fromMap(Map<String, dynamic> map, [AppStoreReleaseConfig? base])
-      : id = map['id'],
-        appId = map['appId'],
-        super.fromMap(map, base);
+  factory AppStoreAppConfig.fromYaml(String id, dynamic data, [AppStoreReleaseConfig? release]) {
+    if (data is Map) {
+      return AppStoreAppConfig(
+        id: id,
+        appId: data['appId'],
+        phased: data['phased'] ?? release?.phased ?? true,
+        manual: data['manual'] ?? release?.manual ?? false,
+      );
+    } else if (data is Object) {
+      return AppStoreAppConfig(
+        id: id,
+        appId: data.toString(),
+        phased: release?.phased ?? true,
+        manual: release?.manual ?? false,
+      );
+    } else {
+      throw Exception('The data for the app store config is neither an app id or an map');
+    }
+  }
 }
 
 class AppStoreCredentialsConfig {
@@ -40,7 +57,7 @@ class AppStoreCredentialsConfig {
     required this.keyFile,
   });
 
-  AppStoreCredentialsConfig.fromMap(Map<String, dynamic> map)
+  AppStoreCredentialsConfig.fromYaml(YamlMap map)
       : keyId = map['keyId'],
         issuerId = map['issuerId'],
         keyFile = map['keyFile'];
@@ -57,13 +74,13 @@ class AppStoreConfig {
     required this.apps,
   });
 
-  AppStoreConfig.fromAppIds({required this.credentials, this.release, required Map<String, String> appIds})
-      : apps = appIds.entries.map((entry) => AppStoreAppConfig(id: entry.key, appId: entry.value)).toList();
+  factory AppStoreConfig.fromYaml(YamlMap map) {
+    final credentials = AppStoreCredentialsConfig.fromYaml(map['credentials']);
+    final release = map['release'] != null ? AppStoreReleaseConfig.fromYaml(map['release']) : null;
+    final apps = (map['apps'] as YamlMap).entries.map((entry) {
+      return AppStoreAppConfig.fromYaml(entry.key, entry.value, release);
+    }).toList();
 
-  factory AppStoreConfig.fromMap(Map<String, dynamic> map) {
-    final credentials = AppStoreCredentialsConfig.fromMap(map['credentials']);
-    final release = AppStoreReleaseConfig.fromMap(map['release']);
-    final apps = (map['apps'] as List).map((item) => AppStoreAppConfig.fromMap(item, release)).toList();
     return AppStoreConfig(credentials: credentials, release: release, apps: apps);
   }
 

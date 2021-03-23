@@ -64,7 +64,7 @@ abstract class PlayStoreCommand extends Command {
       final appConfig = config.apps.firstWhere((app) => app.id == id);
       return setupTask()
         ..config = appConfig
-        ..api = client.getTrackApi(packageName: appConfig.packageName);
+        ..api = client.getTrackApi(packageName: appConfig.appId);
     }).toList();
   }
 

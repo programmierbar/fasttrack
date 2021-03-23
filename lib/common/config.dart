@@ -1,7 +1,22 @@
+import 'dart:io';
+
 import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/playstore/config.dart';
+import 'package:yaml/yaml.dart';
 
 class StoreConfig {
+  static Future<StoreConfig> fromFile(String path) async {
+    final file = File(path);
+    if (!await file.exists()) {
+      throw Exception('The fasttrack config file $path is missing');
+    }
+
+    final yaml = await file.readAsString();
+    final data = loadYaml(yaml);
+
+    return StoreConfig.fromYaml(data);
+  }
+
   final MetadataConfig? metadata;
   final AppStoreConfig? appStore;
   final PlayStoreConfig? playStore;
@@ -12,10 +27,10 @@ class StoreConfig {
     this.playStore,
   });
 
-  StoreConfig.fromMap(Map<String, dynamic> map)
-      : metadata = map.containsKey('metadata') ? MetadataConfig.fromMap(map['metadata']) : null,
-        appStore = map.containsKey('appStore') ? AppStoreConfig.fromMap(map['appStore']) : null,
-        playStore = map.containsKey('playStore') ? PlayStoreConfig.fromMap(map['playStore']) : null;
+  StoreConfig.fromYaml(YamlMap map)
+      : metadata = map['metadata'] != null ? MetadataConfig.fromMap(map['metadata']) : null,
+        appStore = map['appStore'] != null ? AppStoreConfig.fromYaml(map['appStore']) : null,
+        playStore = map['playStore'] != null ? PlayStoreConfig.fromYaml(map['playStore']) : null;
 }
 
 class MetadataConfig {
@@ -23,7 +38,8 @@ class MetadataConfig {
   final String filePrefix;
 
   const MetadataConfig({required this.dir, this.filePrefix = 'release_notes_'});
-  MetadataConfig.fromMap(Map<String, dynamic> map)
+
+  MetadataConfig.fromMap(YamlMap map)
       : dir = map['dir'],
         filePrefix = map['filePrefix'] ?? 'release_notes_';
 }
