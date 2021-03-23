@@ -11,6 +11,11 @@ class StoreConfig {
     this.appStore,
     this.playStore,
   });
+
+  StoreConfig.fromMap(Map<String, dynamic> map)
+      : metadata = map.containsKey('metadata') ? MetadataConfig.fromMap(map['metadata']) : null,
+        appStore = map.containsKey('appStore') ? AppStoreConfig.fromMap(map['appStore']) : null,
+        playStore = map.containsKey('playStore') ? PlayStoreConfig.fromMap(map['playStore']) : null;
 }
 
 class MetadataConfig {
@@ -18,4 +23,7 @@ class MetadataConfig {
   final String filePrefix;
 
   const MetadataConfig({required this.dir, this.filePrefix = 'release_notes_'});
+  MetadataConfig.fromMap(Map<String, dynamic> map)
+      : dir = map['dir'],
+        filePrefix = map['filePrefix'] ?? 'release_notes_';
 }

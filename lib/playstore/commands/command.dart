@@ -41,7 +41,7 @@ abstract class PlayStoreCommand extends Command {
     );
   }
 
-  Iterable<String> get appIds => getList<String>(appOption) ?? config.packageNames.keys;
+  Iterable<String> get appIds => getList<String>(appOption) ?? config.appIds;
   String? get version => getParam(versionOption);
   String get track => getParam(trackOption);
 
@@ -61,10 +61,10 @@ abstract class PlayStoreCommand extends Command {
   Future<List<CommandTask>> setup() async {
     final client = await getClient();
     return appIds.map((id) {
-      final task = setupTask();
-      task.appId = id;
-      task.api = client.getTrackApi(packageName: config.packageNames[id]!);
-      return task;
+      final appConfig = config.apps.firstWhere((app) => app.id == id);
+      return setupTask()
+        ..config = appConfig
+        ..api = client.getTrackApi(packageName: appConfig.packageName);
     }).toList();
   }
 
@@ -80,5 +80,8 @@ abstract class PlayStoreCommand extends Command {
 }
 
 abstract class PlayStoreCommandTask extends CommandTask {
+  late final PlayStoreAppConfig config;
   late final PlayStoreTrackApi api;
+
+  String get id => config.id;
 }

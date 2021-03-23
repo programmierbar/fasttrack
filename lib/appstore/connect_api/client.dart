@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model/build.dart';
 import 'package:fasttrack/appstore/connect_api/model/model.dart';
 import 'package:fasttrack/appstore/connect_api/model/version.dart';
@@ -76,7 +77,7 @@ class AppStoreConnectApi {
 }
 
 class AppStoreConnectClient {
-  final AppStoreConnectTokenConfig _config;
+  final AppStoreCredentialsConfig _config;
   final Client _client = Client();
 
   AppStoreConnectToken? _token;

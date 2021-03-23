@@ -9,12 +9,14 @@ import 'package:fasttrack/common/config.dart';
 import 'package:fasttrack/playstore/commands/command.dart';
 import 'package:fasttrack/playstore/config.dart';
 
-const config = StoreConfig(
+final config = StoreConfig(
   metadata: MetadataConfig(dir: './metadata'),
-  appStore: AppStoreConfig(
-    keyId: '47KUQ5A2CF',
-    issuerId: '69a6de6f-9699-47e3-e053-5b8c7c11a4d1',
-    keyFile: './credentials/AuthKey_47KUQ5A2CF.pem',
+  appStore: AppStoreConfig.fromAppIds(
+    credentials: AppStoreCredentialsConfig(
+      keyId: '47KUQ5A2CF',
+      issuerId: '69a6de6f-9699-47e3-e053-5b8c7c11a4d1',
+      keyFile: './credentials/AuthKey_47KUQ5A2CF.pem',
+    ),
     appIds: {
       'de': '595098366',
       'en': '595558452',
@@ -26,7 +28,7 @@ const config = StoreConfig(
       'ru': '598949838'
     },
   ),
-  playStore: PlayStoreConfig(
+  playStore: PlayStoreConfig.fromPackageNames(
     keyFile: './credentials/pics-8f026-f32e0b8abb61.json',
     packageNames: {
       'de': 'de.lotum.whatsinthefoto.de',

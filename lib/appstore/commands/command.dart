@@ -15,7 +15,7 @@ class AppStoreCommandGroup extends args.Command {
   final String description = 'Bundles all AppStore related commands';
 
   AppStoreCommandGroup(StoreConfig config) {
-    final client = AppStoreConnectClient(config.appStore!);
+    final client = AppStoreConnectClient(config.appStore!.credentials);
     final loader = ReleaseNotesLoader(
       path: config.metadata!.dir,
       filePrefix: config.metadata!.filePrefix,
@@ -57,14 +57,15 @@ abstract class AppStoreCommand extends Command {
     );
   }
 
-  Iterable<String> get appIds => getList<String>(appOption) ?? config.appIds.keys;
+  Iterable<String> get appIds => getList<String>(appOption) ?? config.ids;
   String? get version => getParam(versionOption);
 
   Future<List<CommandTask>> setup() async {
     return appIds.map((id) {
+      final appConfig = config.apps.firstWhere((app) => app.id == id);
       final task = setupTask();
-      task.appId = id;
-      task.api = AppStoreConnectApi(client, config.appIds[id]!);
+      task.config = appConfig;
+      task.api = AppStoreConnectApi(client, appConfig.appId);
       return task;
     }).toList();
   }
@@ -73,5 +74,8 @@ abstract class AppStoreCommand extends Command {
 }
 
 abstract class AppStoreCommandTask extends CommandTask {
+  late final AppStoreAppConfig config;
   late final AppStoreConnectApi api;
+
+  String get id => config.id;
 }
