@@ -5,8 +5,8 @@ import 'package:fasttrack/playstore/config.dart';
 import 'package:yaml/yaml.dart';
 
 class StoreConfig {
-  static Future<StoreConfig> fromFile(String path) async {
-    final file = File(path);
+  static Future<StoreConfig> load(String path) async {
+    final file = File('$path/fasttrack/config.yaml');
     if (!await file.exists()) {
       throw Exception('The fasttrack config file $path is missing');
     }

@@ -3,17 +3,19 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/common/config.dart';
+import 'package:fasttrack/common/context.dart';
 import 'package:fasttrack/playstore/commands/command.dart';
 
 Future<void> main(List<String> args) async {
-  final runner = CommandRunner('fasttrack', 'Forget crappy fastlane, here comes fasttrack!!!');
+  final config = await StoreConfig.load('.');
+  final context = await Context.setup('.');
 
-  final config = await StoreConfig.fromFile('./fasttrack/config.yml');
+  final runner = CommandRunner('fasttrack', 'Forget crappy fastlane, here comes fasttrack!!!');
   if (config.appStore != null) {
-    runner.addCommand(AppStoreCommandGroup(config));
+    runner.addCommand(AppStoreCommandGroup(config, context));
   }
   if (config.playStore != null) {
-    runner.addCommand(PlayStoreCommandGroup(config.playStore!));
+    runner.addCommand(PlayStoreCommandGroup(config.playStore!, context));
   }
 
   try {

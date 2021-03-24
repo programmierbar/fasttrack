@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
@@ -39,7 +40,7 @@ class AppStorePrepareTask extends AppStoreCommandTask {
     log('${this.version} preparation');
     final version = await _ensureVersion();
     await _updateReleaseNotes(version);
-    log('${this.version} preparation completed');
+    success('${this.version} preparation completed');
   }
 
   Future<AppStoreVersion> _ensureVersion() async {
@@ -67,11 +68,17 @@ class AppStorePrepareTask extends AppStoreCommandTask {
 
     await Future.wait(localizations.map((localization) {
       final locale = localization.locale;
-      final whatsNew = releaseNotes[locale];
-      if (whatsNew == null) {
+      final lookup = releaseNotes.keys.firstWhereOrNull((key) => key.startsWith(locale));
+      if (lookup == null) {
         throw TaskException('Releases notes for locale $locale is missing');
       }
-      return localization.update(AppStoreVersionLocalizationAttributes(whatsNew: whatsNew));
+
+      final whatsNew = releaseNotes[lookup];
+      if (localization.whatsNew != whatsNew) {
+        return localization.update(AppStoreVersionLocalizationAttributes(whatsNew: whatsNew));
+      }
+
+      return Future.value();
     }));
   }
 }

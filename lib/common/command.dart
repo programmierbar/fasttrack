@@ -1,18 +1,46 @@
 import 'package:args/command_runner.dart' as args;
 import 'package:dart_console/dart_console.dart';
+import 'package:fasttrack/common/context.dart';
+
+abstract class CommandGroup extends args.Command {
+  final Context? context;
+
+  CommandGroup(this.context);
+
+  void addCommands(Iterable<Command> commands) {
+    for (final command in commands) {
+      command.context = context;
+      addSubcommand(command);
+    }
+  }
+}
 
 abstract class Command extends args.Command {
-  static const _dryRunFlag = 'dry-run';
+  static const appOption = 'app';
+  static const versionOption = 'version';
+
+  late final Context? context;
 
   Command() {
-    argParser.addFlag(
-      _dryRunFlag,
-      abbr: 'd',
-      help: 'Whether to only validate the promotion',
+    argParser.addOption(
+      versionOption,
+      abbr: 'v',
+      help: 'The version that should be handled. Define *all* if you want to list all versions.',
     );
   }
 
-  bool get dryRun => getParam(_dryRunFlag);
+  Iterable<String> get appIds => getList<String>(appOption)!;
+
+  String? get version {
+    final version = getParam(versionOption);
+    if (version == null) {
+      return context?.version.version;
+    } else if (version == 'all') {
+      return null;
+    } else {
+      return version;
+    }
+  }
 
   T? getParam<T>(String name) => argResults?[name] as T?;
   Iterable<T>? getList<T>(String name) => argResults?[name] != null ? argResults![name].cast<T>() : null;
@@ -26,8 +54,8 @@ abstract class Command extends args.Command {
     for (final task in tasks) {
       console.writeLine('${task.id}: initializing...');
     }
-    var line = 0;
-    //var line = console.cursorPosition!.row - tasks.length;
+    //var line = 0;
+    var line = console.cursorPosition!.row - tasks.length;
     for (final task in tasks) {
       task._output = ConsoleOutput._(console, line++);
     }

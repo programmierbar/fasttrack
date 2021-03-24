@@ -43,11 +43,13 @@ class AppStoreSubmitCommand extends AppStoreCommand {
   AppStoreCommandTask setupTask() {
     return AppStoreSubmitTask(
         version: version,
-        build: getParam(_buildOption),
+        build: build,
         manual: getParam(_manualFlag),
         phased: getParam(_phasedFlag),
         reject: getParam(_rejectFlag));
   }
+
+  String? get build => getParam(_buildOption) ?? context?.version.build;
 }
 
 class AppStoreSubmitTask extends AppStoreCommandTask {
@@ -59,8 +61,13 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
   final bool phased;
   final bool reject;
 
-  AppStoreSubmitTask(
-      {required this.version, required this.build, required this.manual, required this.phased, required this.reject});
+  AppStoreSubmitTask({
+    required this.version,
+    required this.build,
+    required this.manual,
+    required this.phased,
+    required this.reject,
+  });
 
   Future<void> run() async {
     var version = await _getVersion();
@@ -94,7 +101,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
     var submission = version.submission;
     if (!reject && submission == null) {
       submission = await version.addSubmission();
-      success('${version.versionString} (${build.version}submitted for app review');
+      success('${version.versionString} (${build.version}) submitted for review');
     } else if (submission != null) {
       if (!submission.canReject) {
         throw TaskException('${version.versionString} can not be unsubmitted anymore');

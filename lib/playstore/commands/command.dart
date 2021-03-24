@@ -1,20 +1,22 @@
-import 'package:args/command_runner.dart' as args;
 import 'package:fasttrack/common/command.dart';
+import 'package:fasttrack/common/context.dart';
 import 'package:fasttrack/playstore/client.dart';
 import 'package:fasttrack/playstore/commands/promote.dart';
 import 'package:fasttrack/playstore/commands/status.dart';
 import 'package:fasttrack/playstore/commands/update.dart';
 import 'package:fasttrack/playstore/config.dart';
 
-class PlayStoreCommandGroup extends args.Command {
+class PlayStoreCommandGroup extends CommandGroup {
   final String name = 'playstore';
   final List<String> aliases = ['ps'];
   final String description = 'Bundles all play store related commands';
 
-  PlayStoreCommandGroup(PlayStoreConfig config) {
-    addSubcommand(PlayStoreStatusCommand(config));
-    addSubcommand(PlayStorePromoteCommand(config));
-    addSubcommand(PlayStoreUpdateCommand(config));
+  PlayStoreCommandGroup(PlayStoreConfig config, Context? context) : super(context) {
+    addCommands([
+      PlayStoreStatusCommand(config),
+      PlayStorePromoteCommand(config),
+      PlayStoreUpdateCommand(config),
+    ]);
   }
 }
 
@@ -23,6 +25,7 @@ abstract class PlayStoreCommand extends Command {
   static const versionOption = 'version';
   static const trackOption = 'track';
   static const rolloutOption = 'rollout';
+  static const _dryRunFlag = 'dry-run';
 
   final PlayStoreConfig config;
 
@@ -34,16 +37,17 @@ abstract class PlayStoreCommand extends Command {
       allowed: config.ids,
       defaultsTo: config.ids,
     );
-    argParser.addOption(
-      versionOption,
-      abbr: 'v',
-      help: 'The version that should be promoted, updated or checked',
+    argParser.addFlag(
+      _dryRunFlag,
+      abbr: 'd',
+      help: 'Whether to only validate the promotion',
     );
   }
 
   Iterable<String> get appIds => getList<String>(appOption)!;
   String? get version => getParam(versionOption);
   String get track => getParam(trackOption);
+  bool get dryRun => getParam(_dryRunFlag);
 
   double get rollout {
     final value = getParam(rolloutOption);
