@@ -85,37 +85,26 @@ class AppStoreConnectClient {
   AppStoreConnectClient(this._config);
 
   Future<ApiResponse> get(GetRequest request) async {
-    final uri = request.toUri();
-    final token = await _getToken();
-    final response = await _client.get(uri, headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${token.value}',
-    });
-    //print('Get response ${response.body}');
-
-    return ApiResponse(this, response);
+    return _handle(_client.get(
+      request.toUri(),
+      headers: await _getHeaders(),
+    ));
   }
 
   Future<ApiResponse> post(String path, Map<String, dynamic> data) async {
-    final response = await _client.post(
+    return _handle(_client.post(
       _getUri(path),
       headers: await _getHeaders(),
       body: jsonEncode({'data': data}),
-    );
-
-    //print('Post response ${response.body}');
-    return ApiResponse(this, response);
+    ));
   }
 
   Future<ApiResponse> patch(String path, Map<String, dynamic> data) async {
-    final response = await _client.patch(
+    return _handle(_client.patch(
       _getUri(path),
       headers: await _getHeaders(),
       body: jsonEncode({'data': data}),
-    );
-
-    //print('Patch response ${response.body}');
-    return ApiResponse(this, response);
+    ));
   }
 
   Future<T> patchAttributes<T extends Model>({
@@ -132,10 +121,10 @@ class AppStoreConnectClient {
   }
 
   Future<void> delete(String path) async {
-    await _client.delete(
+    await _handle(_client.delete(
       _getUri(path),
       headers: await _getHeaders(),
-    );
+    ));
   }
 
   Uri _getUri(String path) => Uri.parse(_apiUri + path);
@@ -154,6 +143,15 @@ class AppStoreConnectClient {
       issuerId: _config.issuerId,
       path: _config.keyFile,
     );
+  }
+
+  Future<ApiResponse> _handle(Future<Response> operation) async {
+    final response = await operation;
+    if (response.statusCode >= 200 && response.statusCode <= 299) {
+      return ApiResponse(this, response);
+    } else {
+      throw ApiException(response.statusCode, response.body);
+    }
   }
 }
 
@@ -214,4 +212,13 @@ class ApiResponse {
 
   List<T> asList<T extends Model>() => ModelParser.parseList<T>(_client, json);
   T as<T extends Model>() => ModelParser.parse<T>(_client, json);
+}
+
+class ApiException {
+  final int statusCode;
+  final String message;
+
+  ApiException(this.statusCode, this.message);
+
+  String toString() => '$statusCode: $message';
 }

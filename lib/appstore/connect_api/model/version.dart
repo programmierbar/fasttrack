@@ -85,25 +85,20 @@ class AppStoreVersion extends CallableModel {
 }
 
 class AppStoreVersionAttributes implements ModelAttributes {
-  AppStorePlatform? platform;
-  String? versionString;
-  AppStoreState? appStoreState;
-  ReleaseType? releaseType;
+  final AppStorePlatform? platform;
+  final String? versionString;
+  final ReleaseType? releaseType;
 
   AppStoreVersionAttributes({
     this.platform,
     this.versionString,
-    this.appStoreState,
     this.releaseType,
   });
-
-  bool get isEmpty => platform == null && versionString == null && appStoreState == null && releaseType == null;
 
   Map<String, dynamic?> toMap() {
     return {
       'platform': platform?.toString(),
       'versionString': versionString,
-      'appStoreState': appStoreState.toString(),
       'releaseType': releaseType?.toString(),
     };
   }

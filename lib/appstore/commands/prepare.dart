@@ -54,15 +54,8 @@ class AppStorePrepareTask extends AppStoreCommandTask {
     }
 
     final version = versions.first;
-    final attributes = AppStoreVersionAttributes();
     if (version.versionString != this.version) {
-      attributes.versionString = this.version;
-    }
-    if (version.appStoreState != AppStoreState.prepareForSubmission) {
-      attributes.appStoreState = AppStoreState.prepareForSubmission;
-    }
-    if (!attributes.isEmpty) {
-      await version.update(attributes);
+      await version.update(AppStoreVersionAttributes(versionString: this.version));
     }
 
     return version;
