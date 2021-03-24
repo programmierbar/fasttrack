@@ -73,7 +73,6 @@ class PlayStoreUpdateTask extends PlayStoreCommandTask {
         return warning('${release.name} is already halted');
       }
       release.status = 'halted';
-      release.userFraction = null;
     }
 
     track.releases = [release];
