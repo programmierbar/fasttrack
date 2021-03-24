@@ -5,7 +5,6 @@ import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/appstore/connect_api/model/phased_release.dart';
 import 'package:fasttrack/common/command.dart';
-import 'package:fasttrack/common/extension.dart';
 
 class AppStoreSubmitCommand extends AppStoreCommand {
   static const _buildOption = 'build';
@@ -82,7 +81,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
     if (build == null) {
       build = await _getBuild(version.versionString);
       if (!build.valid) {
-        throw TaskException('The requested build is ${enumToString(build.processingState)}');
+        throw TaskException('The requested build is ${build.processingState.toString().toLowerCase()}');
       }
       await version.addBuild(build);
     }

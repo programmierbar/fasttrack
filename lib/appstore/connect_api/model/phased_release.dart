@@ -1,6 +1,5 @@
 import 'package:fasttrack/appstore/connect_api/client.dart';
 import 'package:fasttrack/appstore/connect_api/model/model.dart';
-import 'package:fasttrack/common/extension.dart';
 
 class AppStoreVersionPhasedReleaseAttributes extends ModelAttributes {
   final PhasedReleaseState phasedReleaseState;
@@ -8,7 +7,7 @@ class AppStoreVersionPhasedReleaseAttributes extends ModelAttributes {
   AppStoreVersionPhasedReleaseAttributes({required this.phasedReleaseState});
 
   Map<String, dynamic?> toMap() {
-    return {'phasedReleaseState': enumToString(phasedReleaseState).toUpperCase()};
+    return {'phasedReleaseState': phasedReleaseState.toString()};
   }
 }
 
@@ -22,8 +21,7 @@ class AppStoreVersionPhasedRelease extends CallableModel {
   final int currentDayNumber;
 
   AppStoreVersionPhasedRelease(String id, AppStoreConnectClient client, Map<String, dynamic> attributes)
-      : phasedReleaseState =
-            enumfromString(PhasedReleaseState.values, (attributes['phasedReleaseState'] as String).toLowerCase()),
+      : phasedReleaseState = PhasedReleaseState._(attributes['phasedReleaseState']),
         totalPauseDuration = Duration(days: attributes['totalPauseDuration']),
         currentDayNumber = attributes['currentDayNumber'],
         super(type, id, client);
@@ -43,9 +41,16 @@ class AppStoreVersionPhasedRelease extends CallableModel {
   }
 }
 
-enum PhasedReleaseState {
-  inactive,
-  active,
-  paused,
-  complete,
+class PhasedReleaseState {
+  static const inactive = PhasedReleaseState._('INACTIVE');
+  static const active = PhasedReleaseState._('ACTIVE');
+  static const paused = PhasedReleaseState._('PAUSED');
+  static const complete = PhasedReleaseState._('COMPLETE');
+
+  final String _value;
+  const PhasedReleaseState._(this._value);
+
+  int get hashCode => _value.hashCode;
+  bool operator ==(dynamic other) => other is PhasedReleaseState && other._value == _value;
+  String toString() => _value;
 }

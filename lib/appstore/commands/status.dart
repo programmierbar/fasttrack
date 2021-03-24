@@ -1,7 +1,6 @@
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/common/command.dart';
-import 'package:fasttrack/common/extension.dart';
 
 class AppStoreStatusCommand extends AppStoreCommand {
   final name = 'status';
@@ -57,7 +56,7 @@ class AppStoreStatusTask extends AppStoreCommandTask {
           parts.add('halted (${release.totalPauseDuration.inDays} days)');
           color = StatusColor.warning;
         } else {
-          parts.add(enumToString(release.phasedReleaseState));
+          parts.add(release.phasedReleaseState.toString());
         }
       }
     }

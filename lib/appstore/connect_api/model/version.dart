@@ -43,12 +43,6 @@ class AppStoreVersion extends CallableModel {
     return response.asList<AppStoreVersionLocalization>();
   }
 
-  /*Future<AppStoreVersionPhasedRelease?> getPhasedRelease() async {
-    final request = GetRequest('appStoreVersions/$id/appStoreVersionPhasedRelease');
-    final response = await client.get(request);
-    return response.as<AppStoreVersionPhasedRelease>();
-  }*/
-
   Future<AppStoreVersionPhasedRelease> addPhasedRelease(AppStoreVersionPhasedReleaseAttributes attributes) async {
     final response = await client.post('appStoreVersionPhasedReleases', {
       'type': 'appStoreVersionPhasedReleases',
@@ -80,10 +74,7 @@ class AppStoreVersion extends CallableModel {
       'type': AppStoreVersionSubmission.type,
       'relationships': {
         'appStoreVersion': {
-          'data': {
-            'type': AppStoreVersion.type,
-            'id': id,
-          }
+          'data': {'type': AppStoreVersion.type, 'id': id}
         }
       }
     });
