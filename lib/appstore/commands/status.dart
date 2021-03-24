@@ -1,10 +1,13 @@
 import 'package:fasttrack/appstore/commands/command.dart';
+import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/common/command.dart';
 
 class AppStoreStatusCommand extends AppStoreCommand {
   final name = 'status';
   final description = 'Get the status of all app versions';
+
+  AppStoreStatusCommand(AppStoreConfig config) : super(config);
 
   AppStoreCommandTask setupTask() {
     return AppStoreStatusTask(version);
@@ -17,7 +20,7 @@ class AppStoreStatusTask extends AppStoreCommandTask {
   AppStoreStatusTask(this.version);
 
   Future<void> run() async {
-    log('loading...');
+    log('status loading');
 
     final versions = await api.getVersions(
       versions: version != null ? [version!] : null,

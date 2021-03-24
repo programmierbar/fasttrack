@@ -27,7 +27,7 @@ class PlayStoreAppConfig extends PlayStoreReleaseConfig {
 
 class PlayStoreConfig extends PlayStoreReleaseConfig {
   final String keyFile;
-  final List<PlayStoreAppConfig> apps;
+  final Map<String, PlayStoreAppConfig> apps;
 
   const PlayStoreConfig({
     required this.keyFile,
@@ -40,11 +40,11 @@ class PlayStoreConfig extends PlayStoreReleaseConfig {
     return PlayStoreConfig(
       keyFile: yaml['keyFile'],
       rollout: release.rollout,
-      apps: (yaml['apps'] as Map).entries.map((entry) {
-        return PlayStoreAppConfig.fromYaml(entry.key, entry.value, release);
-      }).toList(),
+      apps: (yaml['apps'] as Map).map((key, value) {
+        return MapEntry(key as String, PlayStoreAppConfig.fromYaml(key, value, release));
+      }),
     );
   }
 
-  Iterable<String> get appIds => apps.map((app) => app.id);
+  Iterable<String> get ids => apps.keys;
 }

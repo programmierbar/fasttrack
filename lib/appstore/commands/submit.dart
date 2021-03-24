@@ -2,6 +2,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
+import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/appstore/connect_api/model/phased_release.dart';
 import 'package:fasttrack/common/command.dart';
@@ -15,7 +16,7 @@ class AppStoreSubmitCommand extends AppStoreCommand {
   final name = 'submit';
   final description = 'Submit a app store version for review';
 
-  AppStoreSubmitCommand() {
+  AppStoreSubmitCommand(AppStoreConfig config) : super(config) {
     argParser.addOption(
       _buildOption,
       abbr: 'b',
@@ -32,7 +33,11 @@ class AppStoreSubmitCommand extends AppStoreCommand {
       help: 'Whether to do a phased release for the app store version',
       defaultsTo: true,
     );
-    argParser.addFlag(_rejectFlag, abbr: 'r', help: 'Whether to reject the current version submission');
+    argParser.addFlag(
+      _rejectFlag,
+      abbr: 'r',
+      help: 'Whether to reject the current version submission',
+    );
   }
 
   AppStoreCommandTask setupTask() {

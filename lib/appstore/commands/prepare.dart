@@ -1,42 +1,50 @@
 import 'package:fasttrack/appstore/commands/command.dart';
+import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/common/command.dart';
 import 'package:fasttrack/common/metadata.dart';
 
-class AppStoreCreateCommand extends AppStoreCommand {
-  final name = 'create';
-  final description = 'Create and manage new app store version';
+class AppStorePrepareCommand extends AppStoreCommand {
+  final name = 'prepare';
+  final description = '''Prepare new app store version for submission.\n\n 
+      This will either create a new version, if no editable version is available,
+      or update the current editable version with the new version string''';
 
   final ReleaseNotesLoader loader;
 
-  AppStoreCreateCommand(this.loader);
+  AppStorePrepareCommand(AppStoreConfig config, this.loader) : super(config);
 
   AppStoreCommandTask setupTask() {
-    return AppStoreCreateTask(loader: loader, version: version);
+    return AppStorePrepareTask(
+      loader: loader,
+      version: version,
+    );
   }
 }
 
-class AppStoreCreateTask extends AppStoreCommandTask {
+class AppStorePrepareTask extends AppStoreCommandTask {
   final ReleaseNotesLoader loader;
   final String? version;
 
-  AppStoreCreateTask({
+  AppStorePrepareTask({
     required this.loader,
     required this.version,
   });
 
   Future<void> run() async {
+    if (this.version == null) {
+      throw TaskException('version param is missing');
+    }
+
+    log('${this.version} preparation');
     final version = await _ensureVersion();
     await _updateReleaseNotes(version);
+    log('${this.version} preparation completed');
   }
 
   Future<AppStoreVersion> _ensureVersion() async {
     final versions = await api.getVersions(states: AppStoreState.editStates, platforms: [AppStorePlatform.iOS]);
     if (versions.isEmpty) {
-      if (this.version == null) {
-        throw TaskException('version param is missing');
-      }
-
       return await api.postVersion(
         attributes: AppStoreVersionAttributes(
           versionString: this.version,
@@ -46,8 +54,15 @@ class AppStoreCreateTask extends AppStoreCommandTask {
     }
 
     final version = versions.first;
+    final attributes = AppStoreVersionAttributes();
     if (version.versionString != this.version) {
-      await version.update(AppStoreVersionAttributes(versionString: this.version));
+      attributes.versionString = this.version;
+    }
+    if (version.appStoreState != AppStoreState.prepareForSubmission) {
+      attributes.appStoreState = AppStoreState.prepareForSubmission;
+    }
+    if (!attributes.isEmpty) {
+      await version.update(attributes);
     }
 
     return version;

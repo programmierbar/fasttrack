@@ -1,5 +1,5 @@
 import 'package:args/command_runner.dart' as args;
-import 'package:fasttrack/appstore/commands/create.dart';
+import 'package:fasttrack/appstore/commands/prepare.dart';
 import 'package:fasttrack/appstore/commands/release.dart';
 import 'package:fasttrack/appstore/commands/status.dart';
 import 'package:fasttrack/appstore/commands/submit.dart';
@@ -12,25 +12,23 @@ import 'package:fasttrack/common/metadata.dart';
 class AppStoreCommandGroup extends args.Command {
   final String name = 'appstore';
   final List<String> aliases = ['as'];
-  final String description = 'Bundles all AppStore related commands';
+  final String description = 'Bundles all appstore related commands';
 
   AppStoreCommandGroup(StoreConfig config) {
-    final client = AppStoreConnectClient(config.appStore!.credentials);
-    final loader = ReleaseNotesLoader(
+    final storeConfig = config.appStore!;
+    final releaseNotes = ReleaseNotesLoader(
       path: config.metadata!.dir,
       filePrefix: config.metadata!.filePrefix,
     );
 
     final commands = [
-      AppStoreStatusCommand(),
-      AppStoreCreateCommand(loader),
-      AppStoreSubmitCommand(),
-      AppStoreReleaseCommand()
+      AppStoreStatusCommand(storeConfig),
+      AppStorePrepareCommand(storeConfig, releaseNotes),
+      AppStoreSubmitCommand(storeConfig),
+      AppStoreReleaseCommand(storeConfig)
     ];
 
     for (final command in commands) {
-      command.config = config.appStore!;
-      command.client = client;
       addSubcommand(command);
     }
   }
@@ -40,15 +38,15 @@ abstract class AppStoreCommand extends Command {
   static const appOption = 'app';
   static const versionOption = 'version';
 
-  late final AppStoreConfig config;
-  late final AppStoreConnectClient client;
+  final AppStoreConfig _config;
 
-  AppStoreCommand() {
-    argParser.addOption(
-      appOption,
+  AppStoreCommand(this._config) {
+    argParser.addMultiOption(
+      'app',
       abbr: 'a',
       help: 'Run the command only for a set of apps. You can specify multiple apps by separating them by comma',
-      //allowed: config.packageNames.keys,
+      allowed: _config.ids,
+      defaultsTo: _config.ids,
     );
     argParser.addOption(
       versionOption,
@@ -57,16 +55,16 @@ abstract class AppStoreCommand extends Command {
     );
   }
 
-  Iterable<String> get appIds => getList<String>(appOption) ?? config.ids;
+  Iterable<String> get appIds => getList<String>(appOption)!;
   String? get version => getParam(versionOption);
 
   Future<List<CommandTask>> setup() async {
+    final client = AppStoreConnectClient(_config.credentials);
     return appIds.map((id) {
-      final appConfig = config.apps.firstWhere((app) => app.id == id);
-      final task = setupTask();
-      task.config = appConfig;
-      task.api = AppStoreConnectApi(client, appConfig.appId);
-      return task;
+      final app = _config.apps[id]!;
+      return setupTask()
+        ..config = app
+        ..api = AppStoreConnectApi(client, app.appId);
     }).toList();
   }
 

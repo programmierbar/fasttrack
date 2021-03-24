@@ -66,7 +66,7 @@ class AppStoreCredentialsConfig {
 class AppStoreConfig {
   final AppStoreCredentialsConfig credentials;
   final AppStoreReleaseConfig? release;
-  final List<AppStoreAppConfig> apps;
+  final Map<String, AppStoreAppConfig> apps;
 
   const AppStoreConfig({
     required this.credentials,
@@ -77,12 +77,12 @@ class AppStoreConfig {
   factory AppStoreConfig.fromYaml(YamlMap map) {
     final credentials = AppStoreCredentialsConfig.fromYaml(map['credentials']);
     final release = map['release'] != null ? AppStoreReleaseConfig.fromYaml(map['release']) : null;
-    final apps = (map['apps'] as YamlMap).entries.map((entry) {
-      return AppStoreAppConfig.fromYaml(entry.key, entry.value, release);
-    }).toList();
+    final apps = (map['apps'] as YamlMap).map((key, value) {
+      return MapEntry(key as String, AppStoreAppConfig.fromYaml(key, value, release));
+    });
 
     return AppStoreConfig(credentials: credentials, release: release, apps: apps);
   }
 
-  Iterable<String> get ids => apps.map((app) => app.id);
+  Iterable<String> get ids => apps.keys;
 }

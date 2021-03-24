@@ -112,14 +112,3 @@ class ModelParser {
     return relations;
   }
 }
-
-class AppStorePlatform {
-  static const iOS = AppStorePlatform._('IOS');
-  static const MacOS = AppStorePlatform._('MacOS');
-  static const TvOS = AppStorePlatform._('TV_OS');
-
-  final String _name;
-  const AppStorePlatform._(this._name);
-
-  String toString() => _name;
-}

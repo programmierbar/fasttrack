@@ -25,14 +25,14 @@ abstract class PlayStoreCommand extends Command {
   static const rolloutOption = 'rollout';
 
   final PlayStoreConfig config;
-  PlayStoreApiClient? _client;
 
   PlayStoreCommand(this.config) {
-    argParser.addOption(
+    argParser.addMultiOption(
       appOption,
       abbr: 'a',
       help: 'Run the command only for a set of apps. You can specify multiple apps by separating them by comma',
-      //allowed: config.packageNames.keys,
+      allowed: config.ids,
+      defaultsTo: config.ids,
     );
     argParser.addOption(
       versionOption,
@@ -41,7 +41,7 @@ abstract class PlayStoreCommand extends Command {
     );
   }
 
-  Iterable<String> get appIds => getList<String>(appOption) ?? config.appIds;
+  Iterable<String> get appIds => getList<String>(appOption)!;
   String? get version => getParam(versionOption);
   String get track => getParam(trackOption);
 
@@ -59,24 +59,18 @@ abstract class PlayStoreCommand extends Command {
   }
 
   Future<List<CommandTask>> setup() async {
-    final client = await getClient();
+    final client = PlayStoreApiClient(config.keyFile);
+    await client.connect();
+
     return appIds.map((id) {
-      final appConfig = config.apps.firstWhere((app) => app.id == id);
+      final app = config.apps[id]!;
       return setupTask()
-        ..config = appConfig
-        ..api = client.getTrackApi(packageName: appConfig.appId);
+        ..config = app
+        ..api = client.getTrackApi(packageName: app.appId);
     }).toList();
   }
 
   PlayStoreCommandTask setupTask();
-
-  Future<PlayStoreApiClient> getClient() async {
-    if (_client == null) {
-      _client = PlayStoreApiClient(config.keyFile);
-      await _client!.connect();
-    }
-    return _client!;
-  }
 }
 
 abstract class PlayStoreCommandTask extends CommandTask {

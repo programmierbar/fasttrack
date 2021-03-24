@@ -15,7 +15,7 @@ abstract class Command extends args.Command {
   bool get dryRun => getParam(_dryRunFlag);
 
   T? getParam<T>(String name) => argResults?[name] as T?;
-  Iterable<T>? getList<T>(String name) => (argResults?[name] as String?)?.split(',').cast<T>();
+  Iterable<T>? getList<T>(String name) => argResults?[name] != null ? argResults![name].cast<T>() : null;
 
   Future<List<CommandTask>> setup();
 
@@ -26,8 +26,8 @@ abstract class Command extends args.Command {
     for (final task in tasks) {
       console.writeLine('${task.id}: initializing...');
     }
-    //var line = 0;
-    var line = console.cursorPosition!.row - tasks.length;
+    var line = 0;
+    //var line = console.cursorPosition!.row - tasks.length;
     for (final task in tasks) {
       task._output = ConsoleOutput._(console, line++);
     }

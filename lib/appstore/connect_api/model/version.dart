@@ -9,6 +9,7 @@ class AppStoreVersion extends CallableModel {
   static const type = 'appStoreVersions';
   static const fields = ['versionString', 'appStoreState', 'releaseType'];
 
+  final AppStorePlatform platform;
   final String versionString;
   final AppStoreState appStoreState;
   final ReleaseType releaseType;
@@ -22,7 +23,8 @@ class AppStoreVersion extends CallableModel {
     AppStoreConnectClient client,
     Map<String, dynamic> attributes,
     Map<String, dynamic> relations,
-  )   : versionString = attributes['versionString'],
+  )   : platform = AppStorePlatform._(attributes['platform']),
+        versionString = attributes['versionString'],
         appStoreState = AppStoreState._(attributes['appStoreState']),
         releaseType = ReleaseType._(attributes['releaseType']),
         build = relations['build'] as Build?,
@@ -83,23 +85,39 @@ class AppStoreVersion extends CallableModel {
 }
 
 class AppStoreVersionAttributes implements ModelAttributes {
-  final String? versionString;
-  final AppStorePlatform? platform;
-  final ReleaseType? releaseType;
+  AppStorePlatform? platform;
+  String? versionString;
+  AppStoreState? appStoreState;
+  ReleaseType? releaseType;
 
-  const AppStoreVersionAttributes({
-    this.versionString,
+  AppStoreVersionAttributes({
     this.platform,
+    this.versionString,
+    this.appStoreState,
     this.releaseType,
   });
 
+  bool get isEmpty => platform == null && versionString == null && appStoreState == null && releaseType == null;
+
   Map<String, dynamic?> toMap() {
     return {
-      'versionString': versionString,
       'platform': platform?.toString(),
+      'versionString': versionString,
+      'appStoreState': appStoreState.toString(),
       'releaseType': releaseType?.toString(),
     };
   }
+}
+
+class AppStorePlatform {
+  static const iOS = AppStorePlatform._('IOS');
+  static const MacOS = AppStorePlatform._('MacOS');
+  static const TvOS = AppStorePlatform._('TV_OS');
+
+  final String _name;
+  const AppStorePlatform._(this._name);
+
+  String toString() => _name;
 }
 
 class AppStoreState {
