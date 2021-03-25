@@ -59,10 +59,13 @@ class AppStoreVersionManager {
         phasedReleaseState: PhasedReleaseState.inactive,
       ));
       return true;
-    } else if (!phased && phasedRelease != null) {
+    }
+
+    if (!phased && phasedRelease != null) {
       await phasedRelease.delete();
       return true;
     }
+
     return false;
   }
 
@@ -98,13 +101,30 @@ class AppStoreVersionManager {
     if (!rejected && submission == null) {
       await version.addSubmission();
       return true;
-    } else if (rejected && submission != null) {
+    }
+
+    if (rejected && submission != null) {
       if (!submission.canReject) {
         throw TaskException('${version.versionString} can not be rejected anymore');
       }
       await submission.delete();
       return true;
     }
+
+    return false;
+  }
+
+  Future<bool> updateReleaseState(AppStoreVersion version, PhasedReleaseState state) async {
+    final release = version.phasedRelease;
+    if (version.appStoreState != AppStoreState.readyForSale || release == null) {
+      throw TaskException('${version.versionString} is not in release');
+    }
+
+    if (release.phasedReleaseState != state) {
+      await release.update(AppStoreVersionPhasedReleaseAttributes(phasedReleaseState: state));
+      return true;
+    }
+
     return false;
   }
 

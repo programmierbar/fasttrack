@@ -1,5 +1,5 @@
 import 'package:fasttrack/appstore/commands/prepare.dart';
-import 'package:fasttrack/appstore/commands/release.dart';
+import 'package:fasttrack/appstore/commands/rollout.dart';
 import 'package:fasttrack/appstore/commands/status.dart';
 import 'package:fasttrack/appstore/commands/submit.dart';
 import 'package:fasttrack/appstore/config.dart';
@@ -21,7 +21,7 @@ class AppStoreCommandGroup extends CommandGroup {
       AppStoreStatusCommand(store),
       AppStorePrepareCommand(store, config.metadata),
       AppStoreSubmitCommand(store),
-      AppStoreReleaseCommand(store)
+      AppStoreRolloutCommand(store)
     ]);
   }
 }
