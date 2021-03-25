@@ -21,17 +21,15 @@ class AppStoreStatusTask extends AppStoreCommandTask {
 
   Future<void> run() async {
     log('status loading');
+    final version = this.version != null //
+        ? await manager.getVersion(this.version!)
+        : await manager.liveVersion();
 
-    final versions = await api.getVersions(
-      versions: version != null ? [version!] : null,
-      states: version == null ? AppStoreState.liveStates : null,
-    );
-
-    if (versions.isEmpty) {
-      return error(version == null ? 'no version available' : '$version not available');
+    if (version == null) {
+      return error(this.version == null ? 'no version available' : '${this.version} not available');
     }
 
-    _print(versions.first);
+    _print(version);
   }
 
   void _print(AppStoreVersion version) {
@@ -53,7 +51,7 @@ class AppStoreStatusTask extends AppStoreCommandTask {
           parts.add('completed');
           color = StatusColor.success;
         } else if (release.phasedReleaseState == PhasedReleaseState.active) {
-          parts.add('inProgress (${(release.userFraction * 100).round()}%)');
+          parts.add('in_progress (${(release.userFraction * 100).round()}%)');
           color = StatusColor.warning;
         } else if (release.phasedReleaseState == PhasedReleaseState.paused) {
           parts.add('halted (${release.totalPauseDuration.inDays} days)');

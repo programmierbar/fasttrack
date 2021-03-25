@@ -1,9 +1,7 @@
-import 'package:collection/collection.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/common/command.dart';
-import 'package:fasttrack/common/metadata.dart';
+import 'package:fasttrack/common/config.dart';
 
 class AppStorePrepareCommand extends AppStoreCommand {
   final name = 'prepare';
@@ -12,74 +10,25 @@ class AppStorePrepareCommand extends AppStoreCommand {
 This will either create a new version, if no editable version is available,
 or update the current editable version with the new version string''';
 
-  final ReleaseNotesLoader loader;
-
-  AppStorePrepareCommand(AppStoreConfig config, this.loader) : super(config);
+  AppStorePrepareCommand(AppStoreConfig store, MetadataConfig? metadata) : super(store, metadata);
 
   AppStoreCommandTask setupTask() {
-    return AppStorePrepareTask(
-      loader: loader,
-      version: version,
-    );
+    if (version == null) {
+      throw TaskException('version param is missing');
+    }
+    return AppStorePrepareTask(version: version!);
   }
 }
 
 class AppStorePrepareTask extends AppStoreCommandTask {
-  final ReleaseNotesLoader loader;
-  final String? version;
+  final String version;
 
-  AppStorePrepareTask({
-    required this.loader,
-    required this.version,
-  });
+  AppStorePrepareTask({required this.version});
 
   Future<void> run() async {
-    if (this.version == null) {
-      throw TaskException('version param is missing');
-    }
-
     log('${this.version} preparation');
-    final version = await _ensureVersion();
-    await _updateReleaseNotes(version);
+    final version = await manager.editVersion(this.version);
+    await manager.updateReleaseNotes(version);
     success('${this.version} preparation completed');
-  }
-
-  Future<AppStoreVersion> _ensureVersion() async {
-    final versions = await api.getVersions(states: AppStoreState.editStates, platforms: [AppStorePlatform.iOS]);
-    if (versions.isEmpty) {
-      return await api.postVersion(
-        attributes: AppStoreVersionAttributes(
-          versionString: this.version,
-          platform: AppStorePlatform.iOS,
-        ),
-      );
-    }
-
-    final version = versions.first;
-    if (version.versionString != this.version) {
-      await version.update(AppStoreVersionAttributes(versionString: this.version));
-    }
-
-    return version;
-  }
-
-  Future<void> _updateReleaseNotes(AppStoreVersion version) async {
-    final releaseNotes = await loader.load();
-    final localizations = await version.getLocalizations();
-
-    await Future.wait(localizations.map((localization) {
-      final locale = localization.locale;
-      final lookup = releaseNotes.keys.firstWhereOrNull((key) => key.startsWith(locale));
-      if (lookup == null) {
-        throw TaskException('Releases notes for locale $locale is missing');
-      }
-
-      final whatsNew = releaseNotes[lookup];
-      if (localization.whatsNew != whatsNew) {
-        return localization.update(AppStoreVersionLocalizationAttributes(whatsNew: whatsNew));
-      }
-
-      return Future.value();
-    }));
   }
 }

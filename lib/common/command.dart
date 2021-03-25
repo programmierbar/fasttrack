@@ -57,7 +57,7 @@ abstract class Command extends args.Command {
     //var line = 0;
     var line = console.cursorPosition!.row - tasks.length;
     for (final task in tasks) {
-      task._output = ConsoleOutput._(console, line++);
+      task._logger = ConsoleLogger._(console, line++);
     }
     console.hideCursor();
 
@@ -79,7 +79,7 @@ abstract class Command extends args.Command {
 }
 
 abstract class CommandTask {
-  late final ConsoleOutput _output;
+  late final ConsoleLogger _logger;
 
   CommandTask();
 
@@ -89,7 +89,7 @@ abstract class CommandTask {
   void success(String text) => log(text, color: StatusColor.success);
   void warning(String text) => log(text, color: StatusColor.warning);
   void error(String text) => log(text, color: StatusColor.error);
-  void log(String text, {StatusColor color = StatusColor.info}) => _output.write('$id: $text', color: color);
+  void log(String text, {StatusColor color = StatusColor.info}) => _logger.write('$id: $text', color: color);
 }
 
 class TaskException implements Exception {
@@ -97,11 +97,11 @@ class TaskException implements Exception {
   TaskException(this.message);
 }
 
-class ConsoleOutput {
+class ConsoleLogger {
   final Console _console;
   final int _row;
 
-  ConsoleOutput._(this._console, this._row);
+  ConsoleLogger._(this._console, this._row);
 
   void write(String text, {StatusColor? color}) {
     _console.cursorPosition = Coordinate(_row, 0);
