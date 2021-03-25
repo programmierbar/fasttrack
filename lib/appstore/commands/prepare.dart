@@ -7,9 +7,10 @@ import 'package:fasttrack/common/metadata.dart';
 
 class AppStorePrepareCommand extends AppStoreCommand {
   final name = 'prepare';
-  final description = '''Prepare new app store version for submission.\n\n 
-      This will either create a new version, if no editable version is available,
-      or update the current editable version with the new version string''';
+  final description = '''Prepare new app store version.
+  
+This will either create a new version, if no editable version is available,
+or update the current editable version with the new version string''';
 
   final ReleaseNotesLoader loader;
 
