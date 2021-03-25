@@ -51,14 +51,16 @@ abstract class PlayStoreCommand extends Command {
 
   double get rollout {
     final value = getParam(rolloutOption);
-    if (value is String) {
+    if (value == null) {
+      return config.rollout;
+    } else if (value is String) {
       if (value.contains('%')) {
         return double.parse(value.replaceAll('%', '')) / 100;
       } else {
         return double.parse(value);
       }
     } else {
-      return value ?? 0;
+      return value;
     }
   }
 

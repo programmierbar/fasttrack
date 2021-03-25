@@ -31,22 +31,22 @@ class AppStoreCommandGroup extends CommandGroup {
 }
 
 abstract class AppStoreCommand extends Command {
-  final AppStoreConfig _config;
+  final AppStoreConfig config;
 
-  AppStoreCommand(this._config) {
+  AppStoreCommand(this.config) {
     argParser.addMultiOption(
       Command.appOption,
       abbr: 'a',
       help: 'Run the command only for a set of apps. You can specify multiple apps by separating them by comma',
-      allowed: _config.ids,
-      defaultsTo: _config.ids,
+      allowed: config.ids,
+      defaultsTo: config.ids,
     );
   }
 
   Future<List<CommandTask>> setup() async {
-    final client = AppStoreConnectClient(_config.credentials);
+    final client = AppStoreConnectClient(config.credentials);
     return appIds.map((id) {
-      final app = _config.apps[id]!;
+      final app = config.apps[id]!;
       return setupTask()
         ..config = app
         ..api = AppStoreConnectApi(client, app.appId);

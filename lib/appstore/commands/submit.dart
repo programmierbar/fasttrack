@@ -22,16 +22,12 @@ class AppStoreSubmitCommand extends AppStoreCommand {
       abbr: 'b',
       help: 'The build number to attach to the app store version',
     );
-    argParser.addFlag(
-      _manualFlag,
-      abbr: 'm',
-      help: 'Whether to manual release after approval',
-    );
+    argParser.addFlag(_manualFlag, abbr: 'm', help: 'Whether to manual release after approval', defaultsTo: null);
     argParser.addFlag(
       _phasedFlag,
       abbr: 'p',
       help: 'Whether to do a phased release for the app store version',
-      defaultsTo: true,
+      defaultsTo: null,
     );
     argParser.addFlag(
       _rejectFlag,
@@ -42,14 +38,12 @@ class AppStoreSubmitCommand extends AppStoreCommand {
 
   AppStoreCommandTask setupTask() {
     return AppStoreSubmitTask(
-        version: version,
-        build: build,
-        manual: getParam(_manualFlag),
-        phased: getParam(_phasedFlag),
-        reject: getParam(_rejectFlag));
+        version: version, build: _build, manual: _manual, phased: _phased, reject: getParam(_rejectFlag));
   }
 
-  String? get build => getParam(_buildOption) ?? context?.version.build;
+  String? get _build => getParam(_buildOption) ?? context?.version.build;
+  bool get _manual => getParam(_manualFlag) ?? config.release?.manual ?? false;
+  bool get _phased => getParam(_phasedFlag) ?? config.release?.phased ?? true;
 }
 
 class AppStoreSubmitTask extends AppStoreCommandTask {
