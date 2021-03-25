@@ -45,7 +45,7 @@ class AppStoreVersion extends CallableModel {
     return response.asList<AppStoreVersionLocalization>();
   }
 
-  Future<AppStoreVersionPhasedRelease> addPhasedRelease(AppStoreVersionPhasedReleaseAttributes attributes) async {
+  Future<AppStoreVersionPhasedRelease> setPhasedRelease(AppStoreVersionPhasedReleaseAttributes attributes) async {
     final response = await client.post('appStoreVersionPhasedReleases', {
       'type': 'appStoreVersionPhasedReleases',
       'attributes': attributes.toMap()..removeWhere((_, value) => value == null),
@@ -58,7 +58,7 @@ class AppStoreVersion extends CallableModel {
     return response.as<AppStoreVersionPhasedRelease>();
   }
 
-  Future<AppStoreVersion> addBuild(Build build) async {
+  Future<AppStoreVersion> setBuild(Build build) async {
     final response = await client.patch('appStoreVersions/$id', {
       'type': 'appStoreVersions',
       'id': id,

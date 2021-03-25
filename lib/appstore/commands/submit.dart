@@ -70,6 +70,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
   });
 
   Future<void> run() async {
+    log('${this.version ?? 'release'} submit for review');
     var version = await _getVersion();
 
     final releaseType = manual ? ReleaseType.manual : ReleaseType.afterApproval;
@@ -80,7 +81,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
 
     var phasedRelease = version.phasedRelease;
     if (phased && phasedRelease == null) {
-      phasedRelease = await version.addPhasedRelease(AppStoreVersionPhasedReleaseAttributes(
+      phasedRelease = await version.setPhasedRelease(AppStoreVersionPhasedReleaseAttributes(
         phasedReleaseState: PhasedReleaseState.inactive,
       ));
       log('added phased release');
@@ -90,12 +91,12 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
     }
 
     var build = version.build;
-    if (build == null) {
+    if (build == null || build.version != this.build) {
       build = await _getBuild(version.versionString);
       if (!build.valid) {
         throw TaskException('The requested build is ${build.processingState.toString().toLowerCase()}');
       }
-      await version.addBuild(build);
+      await version.setBuild(build);
     }
 
     var submission = version.submission;
