@@ -2,11 +2,11 @@ import 'package:collection/collection.dart';
 import 'package:fasttrack/playstore/commands/command.dart';
 import 'package:fasttrack/playstore/config.dart';
 
-class PlayStoreUpdateCommand extends PlayStoreCommand {
+class PlayStoreRolloutCommand extends PlayStoreCommand {
   final name = 'update';
   final description = 'Update a release version from on track to another';
 
-  PlayStoreUpdateCommand(PlayStoreConfig config) : super(config) {
+  PlayStoreRolloutCommand(PlayStoreConfig config) : super(config) {
     argParser.addOption(
       PlayStoreCommand.trackOption,
       abbr: 't',

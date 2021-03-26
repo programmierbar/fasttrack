@@ -45,6 +45,17 @@ abstract class ModelAttributes {
   Map<String, dynamic?> toMap();
 }
 
+class ModelRelationship {
+  final String type;
+  final String id;
+
+  ModelRelationship({required this.type, required this.id});
+
+  Map<String, dynamic> toMap() {
+    return {'type': type, 'id': id};
+  }
+}
+
 class ModelParser {
   static List<T> parseList<T extends Model>(AppStoreConnectClient client, Map<String, dynamic> envelope) {
     final includedModels = _parseIncludes(client, envelope);

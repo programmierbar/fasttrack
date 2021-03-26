@@ -35,52 +35,56 @@ class AppStoreVersion extends CallableModel {
   bool get live => AppStoreState.liveStates.contains(appStoreState);
   bool get editable => AppStoreState.editStates.contains(appStoreState);
 
-  Future<AppStoreVersion> update(AppStoreVersionAttributes attributes) {
-    return client.patchAttributes(type: 'appStoreVersions', id: id, attributes: attributes);
-  }
-
   Future<List<AppStoreVersionLocalization>> getLocalizations() async {
     final request = GetRequest('appStoreVersions/$id/appStoreVersionLocalizations');
     final response = await client.get(request);
     return response.asList<AppStoreVersionLocalization>();
   }
 
-  Future<AppStoreVersionPhasedRelease> setPhasedRelease(AppStoreVersionPhasedReleaseAttributes attributes) async {
-    final response = await client.post('appStoreVersionPhasedReleases', {
-      'type': 'appStoreVersionPhasedReleases',
-      'attributes': attributes.toMap()..removeWhere((_, value) => value == null),
-      'relationships': {
-        'appStoreVersion': {
-          'data': {'type': 'appStoreVersions', 'id': id}
-        }
-      }
-    });
-    return response.as<AppStoreVersionPhasedRelease>();
+  Future<AppStoreVersion> update(AppStoreVersionAttributes attributes) {
+    return client.patchModel(
+      type: 'appStoreVersions',
+      id: id,
+      attributes: attributes,
+    );
+  }
+
+  Future<AppStoreVersionPhasedRelease> setPhasedRelease(AppStoreVersionPhasedReleaseAttributes attributes) {
+    return client.postModel(
+      type: AppStoreVersionPhasedRelease.type,
+      attributes: attributes,
+      relationships: {
+        'appStoreVersion': ModelRelationship(type: AppStoreVersion.type, id: id),
+      },
+    );
   }
 
   Future<AppStoreVersion> setBuild(Build build) async {
-    final response = await client.patch('appStoreVersions/$id', {
-      'type': 'appStoreVersions',
-      'id': id,
-      'relationships': {
-        'build': {
-          'data': {'type': 'builds', 'id': build.id}
-        }
-      }
-    });
-    return response.as<AppStoreVersion>();
+    return client.patchModel<AppStoreVersion>(
+      type: AppStoreVersion.type,
+      id: id,
+      relationships: {
+        'build': ModelRelationship(type: Build.type, id: build.id),
+      },
+    );
   }
 
-  Future<AppStoreVersionSubmission> addSubmission() async {
-    final response = await client.post(AppStoreVersionSubmission.type, {
-      'type': AppStoreVersionSubmission.type,
-      'relationships': {
-        'appStoreVersion': {
-          'data': {'type': AppStoreVersion.type, 'id': id}
-        }
-      }
-    });
-    return response.as<AppStoreVersionSubmission>();
+  Future<AppStoreVersionSubmission> addSubmission() {
+    return client.postModel<AppStoreVersionSubmission>(
+      type: AppStoreVersionSubmission.type,
+      relationships: {
+        'appStoreVersion': ModelRelationship(type: AppStoreVersion.type, id: id),
+      },
+    );
+  }
+
+  Future<ReleaseRequest> addReleaseRequest() {
+    return client.postModel<ReleaseRequest>(
+      type: ReleaseRequest.type,
+      relationships: {
+        'appStoreVersion': ModelRelationship(type: AppStoreVersion.type, id: id),
+      },
+    );
   }
 }
 
@@ -165,4 +169,9 @@ class ReleaseType {
   int get hashCode => _name.hashCode;
   bool operator ==(dynamic other) => other is ReleaseType && other._name == _name;
   String toString() => _name;
+}
+
+class ReleaseRequest extends Model {
+  static const type = 'appStoreVersionReleaseRequests';
+  ReleaseRequest(String id) : super(type, id);
 }

@@ -3,7 +3,6 @@ import 'package:fasttrack/appstore/connect_api/model.dart';
 
 class AppStoreVersionSubmission extends CallableModel {
   static const type = 'appStoreVersionSubmissions';
-  static const fields = [];
 
   final bool canReject;
 

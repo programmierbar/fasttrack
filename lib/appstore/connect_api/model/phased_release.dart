@@ -37,7 +37,7 @@ class AppStoreVersionPhasedRelease extends CallableModel {
   }
 
   Future<void> update(AppStoreVersionPhasedReleaseAttributes attributes) {
-    return client.patchAttributes(type: type, id: id, attributes: attributes);
+    return client.patchModel(type: type, id: id, attributes: attributes);
   }
 
   Future<void> delete() {

@@ -99,6 +99,21 @@ class AppStoreConnectClient {
     ));
   }
 
+  Future<T> postModel<T extends Model>({
+    required String type,
+    ModelAttributes? attributes,
+    Map<String, ModelRelationship>? relationships,
+  }) async {
+    final response = await post(type, {
+      'type': type,
+      if (attributes != null) //
+        'attributes': attributes.toMap()..removeWhere((_, value) => value == null),
+      if (relationships != null) //
+        'relationships': relationships.map((key, value) => MapEntry(key, {'data': value.toMap()}))
+    });
+    return response.as<T>();
+  }
+
   Future<ApiResponse> patch(String path, Map<String, dynamic> data) async {
     return _handle(_client.patch(
       _getUri(path),
@@ -107,15 +122,19 @@ class AppStoreConnectClient {
     ));
   }
 
-  Future<T> patchAttributes<T extends Model>({
+  Future<T> patchModel<T extends Model>({
     required String type,
     required String id,
-    required ModelAttributes attributes,
+    ModelAttributes? attributes,
+    Map<String, ModelRelationship>? relationships,
   }) async {
     final response = await patch('$type/$id', {
       'type': type,
       'id': id,
-      'attributes': attributes.toMap()..removeWhere((_, value) => value == null),
+      if (attributes != null) //
+        'attributes': attributes.toMap()..removeWhere((_, value) => value == null),
+      if (relationships != null) //
+        'relationships': relationships.map((key, value) => MapEntry(key, {'data': value.toMap()}))
     });
     return response.as<T>();
   }

@@ -115,17 +115,24 @@ class AppStoreVersionManager {
   }
 
   Future<bool> updateReleaseState(AppStoreVersion version, PhasedReleaseState state) async {
+    if (version.appStoreState != AppStoreState.readyForSale &&
+        version.appStoreState != AppStoreState.pendingDeveloperRelease) {
+      throw TaskException('${version.versionString} is not ready for release');
+    }
+
+    var changed = false;
+    /*if (version.appStoreState == AppStoreState.pendingDeveloperRelease) {
+      await version.update(AppStoreVersionAttributes(appStoreState: AppStoreState.readyForSale));
+      changed = true;
+    }*/
+
     final release = version.phasedRelease;
-    if (version.appStoreState != AppStoreState.readyForSale || release == null) {
-      throw TaskException('${version.versionString} is not in release');
-    }
-
-    if (release.phasedReleaseState != state) {
+    if (release != null && release.phasedReleaseState != state) {
       await release.update(AppStoreVersionPhasedReleaseAttributes(phasedReleaseState: state));
-      return true;
+      changed = true;
     }
 
-    return false;
+    return changed;
   }
 
   Future<Build?> getBuild(

@@ -2,8 +2,8 @@ import 'package:fasttrack/common/command.dart';
 import 'package:fasttrack/common/context.dart';
 import 'package:fasttrack/playstore/client.dart';
 import 'package:fasttrack/playstore/commands/promote.dart';
+import 'package:fasttrack/playstore/commands/rollout.dart';
 import 'package:fasttrack/playstore/commands/status.dart';
-import 'package:fasttrack/playstore/commands/update.dart';
 import 'package:fasttrack/playstore/config.dart';
 
 class PlayStoreCommandGroup extends CommandGroup {
@@ -15,7 +15,7 @@ class PlayStoreCommandGroup extends CommandGroup {
     addCommands([
       PlayStoreStatusCommand(config),
       PlayStorePromoteCommand(config),
-      PlayStoreUpdateCommand(config),
+      PlayStoreRolloutCommand(config),
     ]);
   }
 }
