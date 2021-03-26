@@ -1,17 +1,17 @@
 import 'package:fasttrack/appstore/connect_api/client.dart';
 import 'package:fasttrack/appstore/connect_api/model/model.dart';
 
-class AppStoreVersionPhasedReleaseAttributes extends ModelAttributes {
+class PhasedReleaseAttributes extends ModelAttributes {
   final PhasedReleaseState phasedReleaseState;
 
-  AppStoreVersionPhasedReleaseAttributes({required this.phasedReleaseState});
+  PhasedReleaseAttributes({required this.phasedReleaseState});
 
   Map<String, dynamic?> toMap() {
     return {'phasedReleaseState': phasedReleaseState.toString()};
   }
 }
 
-class AppStoreVersionPhasedRelease extends CallableModel {
+class PhasedRelease extends CallableModel {
   static const type = 'appStoreVersionPhasedReleases';
   static const fields = ['phasedReleaseState', 'totalPauseDuration', 'currentDayNumber'];
   static const _userFractions = {1: 0.01, 2: 0.02, 3: 0.05, 4: 0.1, 5: 0.2, 6: 0.5, 7: 1.0};
@@ -20,7 +20,7 @@ class AppStoreVersionPhasedRelease extends CallableModel {
   final Duration totalPauseDuration;
   final int currentDayNumber;
 
-  AppStoreVersionPhasedRelease(String id, AppStoreConnectClient client, Map<String, dynamic> attributes)
+  PhasedRelease(String id, AppStoreConnectClient client, Map<String, dynamic> attributes)
       : phasedReleaseState = PhasedReleaseState._(attributes['phasedReleaseState']),
         totalPauseDuration = Duration(days: attributes['totalPauseDuration']),
         currentDayNumber = attributes['currentDayNumber'],
@@ -36,7 +36,7 @@ class AppStoreVersionPhasedRelease extends CallableModel {
     }
   }
 
-  Future<void> update(AppStoreVersionPhasedReleaseAttributes attributes) {
+  Future<void> update(PhasedReleaseAttributes attributes) {
     return client.patchModel(type: type, id: id, attributes: attributes);
   }
 

@@ -55,7 +55,7 @@ class AppStoreVersionManager {
   Future<bool> updatePhasedRelease(AppStoreVersion version, {required bool phased}) async {
     final phasedRelease = version.phasedRelease;
     if (phased && phasedRelease == null) {
-      await version.setPhasedRelease(AppStoreVersionPhasedReleaseAttributes(
+      await version.setPhasedRelease(PhasedReleaseAttributes(
         phasedReleaseState: PhasedReleaseState.inactive,
       ));
       return true;
@@ -86,7 +86,7 @@ class AppStoreVersionManager {
 
       final whatsNew = releaseNotes[lookup];
       if (localization.whatsNew != whatsNew) {
-        await localization.update(AppStoreVersionLocalizationAttributes(whatsNew: whatsNew));
+        await localization.update(VersionLocalizationAttributes(whatsNew: whatsNew));
         return true;
       }
 
@@ -128,7 +128,7 @@ class AppStoreVersionManager {
 
     final release = version.phasedRelease;
     if (release != null && release.phasedReleaseState != state) {
-      await release.update(AppStoreVersionPhasedReleaseAttributes(phasedReleaseState: state));
+      await release.update(PhasedReleaseAttributes(phasedReleaseState: state));
       changed = true;
     }
 

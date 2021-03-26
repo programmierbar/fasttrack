@@ -21,12 +21,14 @@ abstract class Model {
     switch (type) {
       case AppStoreVersion.type:
         return AppStoreVersion(id, client, attributes, relations);
-      case AppStoreVersionLocalization.type:
-        return AppStoreVersionLocalization(id, client, attributes);
-      case AppStoreVersionPhasedRelease.type:
-        return AppStoreVersionPhasedRelease(id, client, attributes);
-      case AppStoreVersionSubmission.type:
-        return AppStoreVersionSubmission(id, client, attributes);
+      case VersionLocalization.type:
+        return VersionLocalization(id, client, attributes);
+      case PhasedRelease.type:
+        return PhasedRelease(id, client, attributes);
+      case VersionSubmission.type:
+        return VersionSubmission(id, client, attributes);
+      case ReleaseRequest.type:
+        return ReleaseRequest(id);
       case Build.type:
         return Build(id, attributes);
       default:

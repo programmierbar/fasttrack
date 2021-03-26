@@ -1,27 +1,27 @@
 import 'package:fasttrack/appstore/connect_api/client.dart';
 import 'package:fasttrack/appstore/connect_api/model/model.dart';
 
-class AppStoreVersionLocalization extends CallableModel {
+class VersionLocalization extends CallableModel {
   static const type = 'appStoreVersionLocalizations';
   static const fields = ['whatsNew'];
 
   final String locale;
   final String? whatsNew;
 
-  AppStoreVersionLocalization(String id, AppStoreConnectClient client, Map<String, dynamic> attributes)
+  VersionLocalization(String id, AppStoreConnectClient client, Map<String, dynamic> attributes)
       : locale = attributes['locale'],
         whatsNew = attributes['whatsNew'],
         super(type, id, client);
 
-  Future<AppStoreVersionLocalization> update(AppStoreVersionLocalizationAttributes attributes) async {
+  Future<VersionLocalization> update(VersionLocalizationAttributes attributes) async {
     return client.patchModel(type: 'appStoreVersionLocalizations', id: id, attributes: attributes);
   }
 }
 
-class AppStoreVersionLocalizationAttributes implements ModelAttributes {
+class VersionLocalizationAttributes implements ModelAttributes {
   final String? whatsNew;
 
-  AppStoreVersionLocalizationAttributes({this.whatsNew});
+  VersionLocalizationAttributes({this.whatsNew});
 
   Map<String, dynamic?> toMap() {
     return {

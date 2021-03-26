@@ -15,8 +15,8 @@ class AppStoreVersion extends CallableModel {
   final ReleaseType releaseType;
 
   final Build? build;
-  final AppStoreVersionPhasedRelease? phasedRelease;
-  final AppStoreVersionSubmission? submission;
+  final PhasedRelease? phasedRelease;
+  final VersionSubmission? submission;
 
   AppStoreVersion(
     String id,
@@ -28,17 +28,17 @@ class AppStoreVersion extends CallableModel {
         appStoreState = AppStoreState._(attributes['appStoreState']),
         releaseType = ReleaseType._(attributes['releaseType']),
         build = relations['build'] as Build?,
-        phasedRelease = relations['appStoreVersionPhasedRelease'] as AppStoreVersionPhasedRelease?,
-        submission = relations['appStoreVersionSubmission'] as AppStoreVersionSubmission?,
+        phasedRelease = relations['appStoreVersionPhasedRelease'] as PhasedRelease?,
+        submission = relations['appStoreVersionSubmission'] as VersionSubmission?,
         super(type, id, client);
 
   bool get live => AppStoreState.liveStates.contains(appStoreState);
   bool get editable => AppStoreState.editStates.contains(appStoreState);
 
-  Future<List<AppStoreVersionLocalization>> getLocalizations() async {
+  Future<List<VersionLocalization>> getLocalizations() async {
     final request = GetRequest('appStoreVersions/$id/appStoreVersionLocalizations');
     final response = await client.get(request);
-    return response.asList<AppStoreVersionLocalization>();
+    return response.asList<VersionLocalization>();
   }
 
   Future<AppStoreVersion> update(AppStoreVersionAttributes attributes) {
@@ -49,9 +49,9 @@ class AppStoreVersion extends CallableModel {
     );
   }
 
-  Future<AppStoreVersionPhasedRelease> setPhasedRelease(AppStoreVersionPhasedReleaseAttributes attributes) {
+  Future<PhasedRelease> setPhasedRelease(PhasedReleaseAttributes attributes) {
     return client.postModel(
-      type: AppStoreVersionPhasedRelease.type,
+      type: PhasedRelease.type,
       attributes: attributes,
       relationships: {
         'appStoreVersion': ModelRelationship(type: AppStoreVersion.type, id: id),
@@ -69,9 +69,9 @@ class AppStoreVersion extends CallableModel {
     );
   }
 
-  Future<AppStoreVersionSubmission> addSubmission() {
-    return client.postModel<AppStoreVersionSubmission>(
-      type: AppStoreVersionSubmission.type,
+  Future<VersionSubmission> addSubmission() {
+    return client.postModel<VersionSubmission>(
+      type: VersionSubmission.type,
       relationships: {
         'appStoreVersion': ModelRelationship(type: AppStoreVersion.type, id: id),
       },
