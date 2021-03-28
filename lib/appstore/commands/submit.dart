@@ -52,8 +52,6 @@ class AppStoreSubmitCommand extends AppStoreCommand {
 }
 
 class AppStoreSubmitTask extends AppStoreCommandTask {
-  static const _pollInterval = Duration(seconds: 15);
-
   final String version;
   final String? build;
   final bool manual;
@@ -73,7 +71,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
     final version = await manager.editVersion(this.version);
 
     final releaseType = manual ? ReleaseType.manual : ReleaseType.afterApproval;
-    if (await manager.updateReleaseType(version, releaseType)) {
+    if (await manager.updateReleaseType(version, releaseType: releaseType)) {
       log('updated release type to ${releaseType.toString().toLowerCase()}');
     }
 
@@ -87,7 +85,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
 
     var build = version.build;
     if (build == null || build.version != this.build) {
-      build = await manager.getBuild(version.versionString, buildNumber: this.build, poll: _pollInterval, log: log);
+      build = await manager.getBuild(version: version.versionString, buildNumber: this.build, log: log);
       if (build!.valid) {
         return error('The requested build is ${build.processingState.toString().toLowerCase()}');
       }

@@ -4,6 +4,9 @@ import 'package:fasttrack/appstore/connect_api/model/build.dart';
 import 'package:fasttrack/appstore/connect_api/model/model.dart';
 import 'package:fasttrack/appstore/connect_api/model/phased_release.dart';
 import 'package:fasttrack/appstore/connect_api/model/version_submission.dart';
+import 'package:intl/intl.dart';
+
+final _earliestDateFormat = DateFormat("yyyy-MM-ddThh:'00Z'");
 
 class AppStoreVersion extends CallableModel {
   static const type = 'appStoreVersions';
@@ -13,6 +16,7 @@ class AppStoreVersion extends CallableModel {
   final String versionString;
   final AppStoreState appStoreState;
   final ReleaseType releaseType;
+  final DateTime? earliestReleaseDate;
 
   final Build? build;
   final PhasedRelease? phasedRelease;
@@ -27,6 +31,9 @@ class AppStoreVersion extends CallableModel {
         versionString = attributes['versionString'],
         appStoreState = AppStoreState._(attributes['appStoreState']),
         releaseType = ReleaseType._(attributes['releaseType']),
+        earliestReleaseDate = attributes['earliest_release_date'] != null //
+            ? DateTime.parse(attributes['earliest_release_date'])
+            : null,
         build = relations['build'] as Build?,
         phasedRelease = relations['appStoreVersionPhasedRelease'] as PhasedRelease?,
         submission = relations['appStoreVersionSubmission'] as VersionSubmission?,
@@ -78,32 +85,31 @@ class AppStoreVersion extends CallableModel {
     );
   }
 
-  Future<ReleaseRequest> addReleaseRequest() {
+  /*Future<ReleaseRequest> addReleaseRequest() {
     return client.postModel<ReleaseRequest>(
       type: ReleaseRequest.type,
       relationships: {
         'appStoreVersion': ModelRelationship(type: AppStoreVersion.type, id: id),
       },
     );
-  }
+  }*/
 }
 
 class AppStoreVersionAttributes implements ModelAttributes {
   final AppStorePlatform? platform;
   final String? versionString;
   final ReleaseType? releaseType;
+  final DateTime? earliestReleaseDate;
 
-  AppStoreVersionAttributes({
-    this.platform,
-    this.versionString,
-    this.releaseType,
-  });
+  AppStoreVersionAttributes({this.platform, this.versionString, this.releaseType, this.earliestReleaseDate});
 
   Map<String, dynamic?> toMap() {
     return {
       'platform': platform?.toString(),
       'versionString': versionString,
       'releaseType': releaseType?.toString(),
+      'earliestReleaseDate':
+          earliestReleaseDate != null ? _earliestDateFormat.format(earliestReleaseDate!.toUtc()) : null
     };
   }
 }
@@ -171,7 +177,15 @@ class ReleaseType {
   String toString() => _name;
 }
 
-class ReleaseRequest extends Model {
+extension DateTimeExtension on DateTime {
+  /// Returns an ISO 8601 conform datetime string, that omits the microseconds part
+  String toShortIso8601String() {
+    return toIso8601String().replaceFirst(RegExp(r'\.\d+'), '');
+  }
+}
+
+// no yet supported by app store connect api
+/*class ReleaseRequest extends Model {
   static const type = 'appStoreVersionReleaseRequests';
   ReleaseRequest(String id) : super(type, id);
-}
+}*/

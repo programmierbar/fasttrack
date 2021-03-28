@@ -7,6 +7,7 @@ import 'package:fasttrack/common/metadata.dart';
 
 class AppStoreVersionManager {
   static const _platform = AppStorePlatform.iOS;
+  static const _pollInterval = Duration(seconds: 15);
 
   final AppStoreConnectApi api;
   final ReleaseNotesLoader? loader;
@@ -44,12 +45,40 @@ class AppStoreVersionManager {
     return storeVersion;
   }
 
-  Future<bool> updateReleaseType(AppStoreVersion version, ReleaseType releaseType) async {
+  Future<bool> updateReleaseType(
+    AppStoreVersion version, {
+    required ReleaseType releaseType,
+    DateTime? earliestReleaseDate,
+  }) async {
     if (version.releaseType != releaseType) {
-      await version.update(AppStoreVersionAttributes(releaseType: releaseType));
+      await version.update(AppStoreVersionAttributes(
+        releaseType: releaseType,
+        earliestReleaseDate: earliestReleaseDate,
+      ));
       return true;
     }
     return false;
+  }
+
+  Future<AppStoreVersion> awaitVersionInState({
+    required String version,
+    required AppStoreState state,
+    Duration poll = _pollInterval,
+    void Function(String)? log,
+  }) async {
+    log?.call('Waiting for version $version to reach state ${state.toString().toLowerCase()}');
+    final startTime = DateTime.now();
+
+    while (true) {
+      await Future.delayed(poll);
+      final duration = DateTime.now().difference(startTime);
+
+      log?.call('Waiting for version $version to reach state ${state.toString().toLowerCase()} for $duration');
+      final lookup = (await api.getVersions(versions: [version], states: [state])).firstOrNull;
+      if (lookup != null) {
+        return lookup;
+      }
+    }
   }
 
   Future<bool> updatePhasedRelease(AppStoreVersion version, {required bool phased}) async {
@@ -115,30 +144,19 @@ class AppStoreVersionManager {
   }
 
   Future<bool> updateReleaseState(AppStoreVersion version, PhasedReleaseState state) async {
-    if (version.appStoreState != AppStoreState.readyForSale &&
-        version.appStoreState != AppStoreState.pendingDeveloperRelease) {
-      throw TaskException('${version.versionString} is not ready for release');
-    }
-
-    var changed = false;
-    /*if (version.appStoreState == AppStoreState.pendingDeveloperRelease) {
-      await version.update(AppStoreVersionAttributes(appStoreState: AppStoreState.readyForSale));
-      changed = true;
-    }*/
-
     final release = version.phasedRelease;
     if (release != null && release.phasedReleaseState != state) {
       await release.update(PhasedReleaseAttributes(phasedReleaseState: state));
-      changed = true;
+      return true;
     }
 
-    return changed;
+    return false;
   }
 
-  Future<Build?> getBuild(
-    String version, {
+  Future<Build?> getBuild({
+    required String version,
     String? buildNumber,
-    Duration? poll,
+    Duration poll = _pollInterval,
     void Function(String)? log,
   }) async {
     final build = (await api.getBuilds(version: version, buildNumber: buildNumber)).firstOrNull;

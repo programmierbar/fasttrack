@@ -54,8 +54,8 @@ abstract class Command extends args.Command {
     for (final task in tasks) {
       console.writeLine('${task.id}: initializing...');
     }
-    var line = 0;
-    //var line = console.cursorPosition!.row - tasks.length;
+    //var line = 0;
+    var line = console.cursorPosition!.row - tasks.length;
     for (final task in tasks) {
       task._logger = ConsoleLogger._(console, line++);
     }

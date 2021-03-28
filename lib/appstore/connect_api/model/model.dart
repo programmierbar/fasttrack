@@ -27,8 +27,9 @@ abstract class Model {
         return PhasedRelease(id, client, attributes);
       case VersionSubmission.type:
         return VersionSubmission(id, client, attributes);
-      case ReleaseRequest.type:
-        return ReleaseRequest(id);
+      //not yet supported by the app store connect api
+      //case ReleaseRequest.type:
+      //  return ReleaseRequest(id);
       case Build.type:
         return Build(id, attributes);
       default:
