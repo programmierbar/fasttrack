@@ -86,7 +86,9 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
     var build = version.build;
     if (build == null || build.version != this.build) {
       build = await manager.getBuild(version: version.versionString, buildNumber: this.build, log: log);
-      if (build!.valid) {
+      if (build == null) {
+        return error('The requested build ${version.versionString} ${this.build} was not found');
+      } else if (!build.valid) {
         return error('The requested build is ${build.processingState.toString().toLowerCase()}');
       }
       await version.setBuild(build);
