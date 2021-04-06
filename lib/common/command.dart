@@ -25,8 +25,7 @@ abstract class Command extends args.Command {
     argParser.addOption(
       versionOption,
       abbr: 'v',
-      help:
-          'The version that should be handled. Define *all* if you want to list all versions.',
+      help: 'The version that should be handled. Define *all* if you want to list all versions.',
     );
   }
 
@@ -44,8 +43,7 @@ abstract class Command extends args.Command {
   }
 
   T? getParam<T>(String name) => argResults?[name] as T?;
-  Iterable<T>? getList<T>(String name) =>
-      argResults?[name] != null ? argResults![name].cast<T>() : null;
+  Iterable<T>? getList<T>(String name) => argResults?[name] != null ? argResults![name].cast<T>() : null;
 
   Future<List<CommandTask>> setup();
 
@@ -56,8 +54,8 @@ abstract class Command extends args.Command {
     for (final task in tasks) {
       console.writeLine('${task.id}: initializing...');
     }
-    var line = 0;
-    //var line = console.cursorPosition!.row - tasks.length;
+    //var line = 0;
+    var line = console.cursorPosition!.row - tasks.length;
     for (final task in tasks) {
       task._logger = ConsoleLogger._(console, line++);
     }
@@ -91,8 +89,7 @@ abstract class CommandTask {
   void success(String text) => log(text, color: StatusColor.success);
   void warning(String text) => log(text, color: StatusColor.warning);
   void error(String text) => log(text, color: StatusColor.error);
-  void log(String text, {StatusColor color = StatusColor.info}) =>
-      _logger.write('$id: $text', color: color);
+  void log(String text, {StatusColor color = StatusColor.info}) => _logger.write('$id: $text', color: color);
 }
 
 class TaskException implements Exception {
