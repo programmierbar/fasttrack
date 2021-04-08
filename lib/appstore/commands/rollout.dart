@@ -1,12 +1,28 @@
+import 'package:args/command_runner.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
 
+class CommandDef extends Command {
+  final String name;
+  final String description;
+
+  CommandDef(this.name, this.description);
+}
+
 class AppStoreRolloutCommand extends AppStoreCommand {
   final name = 'rollout';
-  final description = 'Update an version in phased release';
+  final description = '''
+Update an version in phased release
+  
+Available subcommands:
+  start     Start rollout of an version in pending developer release state
+  pause     Pauses the rollout of an version currently in phased release
+  resume    Resumes a paused rollout
+  complete  Completes a phased release and rolls out the version to all users''';
 
   AppStoreRolloutCommand(AppStoreConfig config) : super(config) {
+    //addSubcommand(CommandDef('start', 'Starts the rollout of an release that is in "Pending for developer release" state'));
     argParser.addCommand('start');
     argParser.addCommand('pause');
     argParser.addCommand('resume');
