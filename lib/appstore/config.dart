@@ -1,3 +1,4 @@
+import 'package:fasttrack/common/config.dart';
 import 'package:yaml/yaml.dart';
 
 class AppStoreReleaseConfig {
@@ -60,7 +61,7 @@ class AppStoreCredentialsConfig {
   AppStoreCredentialsConfig.fromYaml(YamlMap map)
       : keyId = map['keyId'],
         issuerId = map['issuerId'],
-        keyFile = map['keyFile'];
+        keyFile = resolvePath(map['keyFile'], './fasttrack/credentials');
 }
 
 class AppStoreConfig {

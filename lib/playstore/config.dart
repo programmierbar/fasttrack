@@ -1,3 +1,4 @@
+import 'package:fasttrack/common/config.dart';
 import 'package:yaml/yaml.dart';
 
 class PlayStoreReleaseConfig {
@@ -38,7 +39,7 @@ class PlayStoreConfig extends PlayStoreReleaseConfig {
   factory PlayStoreConfig.fromYaml(YamlMap yaml) {
     final release = PlayStoreReleaseConfig.fromYaml(yaml);
     return PlayStoreConfig(
-      keyFile: yaml['keyFile'],
+      keyFile: resolvePath(yaml['keyFile'], './fasttrack/credentials'),
       rollout: release.rollout,
       apps: (yaml['apps'] as Map).map((key, value) {
         return MapEntry(key as String, PlayStoreAppConfig.fromYaml(key, value, release));

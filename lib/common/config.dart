@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/playstore/config.dart';
+import 'package:path/path.dart';
 import 'package:yaml/yaml.dart';
 
 class StoreConfig {
@@ -42,4 +43,8 @@ class MetadataConfig {
   MetadataConfig.fromMap(YamlMap map)
       : dir = map['dir'],
         filePrefix = map['filePrefix'] ?? 'release_notes_';
+}
+
+String resolvePath(String path, String root) {
+  return path.startsWith(root) ? path : join(root, path);
 }
