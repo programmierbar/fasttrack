@@ -25,7 +25,7 @@ abstract class Command extends args.Command {
     argParser.addOption(
       versionOption,
       abbr: 'v',
-      help: 'The version that should be handled. Define *all* if you want to list all versions.',
+      help: 'The version that should be handled.',
     );
   }
 
@@ -35,8 +35,6 @@ abstract class Command extends args.Command {
     final version = getParam(versionOption);
     if (version == null) {
       return context?.version.version;
-    } else if (version == 'all') {
-      return null;
     } else {
       return version;
     }

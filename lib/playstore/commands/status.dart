@@ -4,7 +4,6 @@ import 'package:fasttrack/playstore/config.dart';
 import 'package:googleapis/androidpublisher/v3.dart';
 
 class PlayStoreStatusCommand extends PlayStoreCommand {
-  static const _versionOption = 'version';
   static const _trackOption = 'track';
 
   final name = 'status';
@@ -20,9 +19,14 @@ class PlayStoreStatusCommand extends PlayStoreCommand {
     );
   }
 
+  String? get version {
+    final version = super.version;
+    return (version != 'live') ? version : null;
+  }
+
   PlayStoreCommandTask setupTask() {
     return PlayStoreStatusTask(
-      version: getParam(_versionOption),
+      version: version,
       track: getParam(_trackOption),
     );
   }

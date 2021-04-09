@@ -34,7 +34,7 @@ abstract class AppStoreCommand extends Command {
     argParser.addMultiOption(
       Command.appOption,
       abbr: 'a',
-      help: 'Run the command only for a set of apps. You can specify multiple apps by separating them by comma',
+      help: 'Run the command only for a set of apps.',
       allowed: store.ids,
       defaultsTo: store.ids,
     );
