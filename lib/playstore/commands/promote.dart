@@ -5,6 +5,7 @@ import 'package:googleapis/androidpublisher/v3.dart';
 
 class PlayStorePromoteCommand extends PlayStoreCommand {
   static const _toOption = 'to';
+  static const _rolloutOption = 'rollout';
 
   final name = 'promote';
   final description = 'Promote a release version from on track to another';
@@ -24,7 +25,7 @@ class PlayStorePromoteCommand extends PlayStoreCommand {
       defaultsTo: 'production',
     );
     argParser.addOption(
-      PlayStoreCommand.rolloutOption,
+      _rolloutOption,
       abbr: 'r',
       help: 'The fraction at which to rollout the version to the users',
     );
@@ -35,7 +36,7 @@ class PlayStorePromoteCommand extends PlayStoreCommand {
       version: version,
       track: track,
       to: getParam(_toOption),
-      rollout: rollout,
+      rollout: parseFraction(getParam(_rolloutOption)) ?? config.rollout,
       dryRun: dryRun,
     );
   }

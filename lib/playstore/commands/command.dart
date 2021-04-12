@@ -24,7 +24,6 @@ abstract class PlayStoreCommand extends Command {
   static const appOption = 'app';
   static const versionOption = 'version';
   static const trackOption = 'track';
-  static const rolloutOption = 'rollout';
   static const _dryRunFlag = 'dry-run';
 
   final PlayStoreConfig config;
@@ -49,21 +48,6 @@ abstract class PlayStoreCommand extends Command {
   String get track => getParam(trackOption);
   bool get dryRun => getParam(_dryRunFlag);
 
-  double get rollout {
-    final value = getParam(rolloutOption);
-    if (value == null) {
-      return config.rollout;
-    } else if (value is String) {
-      if (value.contains('%')) {
-        return double.parse(value.replaceAll('%', '')) / 100;
-      } else {
-        return double.parse(value);
-      }
-    } else {
-      return value;
-    }
-  }
-
   Future<List<CommandTask>> setup() async {
     final client = PlayStoreApiClient(config.keyFile);
     await client.connect();
@@ -84,4 +68,15 @@ abstract class PlayStoreCommandTask extends CommandTask {
   late final PlayStoreTrackApi api;
 
   String get id => config.id;
+}
+
+double? parseFraction(String? value) {
+  if (value is String) {
+    if (value.contains('%')) {
+      return double.parse(value.replaceAll('%', '')) / 100;
+    } else {
+      return double.parse(value);
+    }
+  }
+  return value;
 }
