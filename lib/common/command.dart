@@ -18,7 +18,9 @@ abstract class CommandGroup extends args.Command {
 abstract class Command extends args.Command {
   static const appOption = 'app';
   static const versionOption = 'version';
+  static const checkFlag = 'check';
 
+  final console = Console();
   late final Context? context;
 
   Command() {
@@ -27,6 +29,12 @@ abstract class Command extends args.Command {
       abbr: 'v',
       help: 'The version that should be handled.',
     );
+    if (checked) {
+      argParser.addFlag(
+        checkFlag,
+        defaultsTo: true,
+      );
+    }
   }
 
   Iterable<String> get appIds => getList<String>(appOption)!;
@@ -40,29 +48,47 @@ abstract class Command extends args.Command {
     }
   }
 
+  bool get checked => false;
+  String get prompt => 'Do you really want to run the command?';
+
   T? getParam<T>(String name) => argResults?[name] as T?;
   Iterable<T>? getList<T>(String name) => argResults?[name] != null ? argResults![name].cast<T>() : null;
 
   Future<List<CommandTask>> setup();
 
   Future<void> run() async {
-    final tasks = await setup();
+    if (!_check()) {
+      return;
+    }
 
-    final console = Console();
+    final tasks = await setup();
     for (final task in tasks) {
       console.writeLine('${task.id}: initializing...');
     }
+
     //var line = 0;
     var line = console.cursorPosition!.row - tasks.length;
     for (final task in tasks) {
       task._logger = ConsoleLogger._(console, line++);
     }
+
     console.hideCursor();
-
     await Future.wait(tasks.map(_runTask));
-
     console.showCursor();
     console.cursorPosition = Coordinate(line, 0);
+  }
+
+  bool _check() {
+    if (checked) {
+      final check = getParam<bool>(checkFlag);
+      if (check == true) {
+        console.write('$prompt (y/N) ');
+        final key = console.readKey();
+        return key.char == 'y' || key.char == 'Y';
+      }
+    }
+
+    return true;
   }
 
   Future<void> _runTask(CommandTask task) async {
