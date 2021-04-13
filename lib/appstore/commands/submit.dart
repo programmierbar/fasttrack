@@ -1,6 +1,7 @@
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
+import 'package:fasttrack/common/config.dart';
 
 class AppStoreSubmitCommand extends AppStoreCommand {
   static const _buildOption = 'build';
@@ -11,7 +12,7 @@ class AppStoreSubmitCommand extends AppStoreCommand {
   final name = 'submit';
   final description = 'Submit a app store version for review';
 
-  AppStoreSubmitCommand(AppStoreConfig config) : super(config) {
+  AppStoreSubmitCommand(AppStoreConfig config, MetadataConfig? metadata) : super(config, metadata) {
     argParser.addOption(
       _buildOption,
       abbr: 'b',

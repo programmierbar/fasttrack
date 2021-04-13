@@ -5,6 +5,15 @@ import 'package:fasttrack/appstore/connect_api/model/version.dart';
 import 'package:fasttrack/common/command.dart';
 import 'package:fasttrack/common/metadata.dart';
 
+extension DurationExtension on Duration {
+  String toFormattedString() {
+    return [inHours, inMinutes.remainder(60), inSeconds.remainder(60)]
+        .where((part) => part > 0)
+        .map((part) => part.toString().padLeft(2, '0'))
+        .join(':');
+  }
+}
+
 class AppStoreVersionManager {
   static const _platform = AppStorePlatform.iOS;
   static const _pollInterval = Duration(seconds: 15);
@@ -73,7 +82,8 @@ class AppStoreVersionManager {
       await Future.delayed(poll);
       final duration = DateTime.now().difference(startTime);
 
-      log?.call('Waiting for version $version to reach state ${state.toString().toLowerCase()} for $duration');
+      log?.call('Waiting for version $version to reach state ${state.toString().toLowerCase()} '
+          'for ${duration.toFormattedString()}');
       final lookup = (await api.getVersions(versions: [version], states: [state])).firstOrNull;
       if (lookup != null) {
         return lookup;
@@ -156,7 +166,7 @@ class AppStoreVersionManager {
   Future<Build?> getBuild({
     required String version,
     String? buildNumber,
-    Duration poll = _pollInterval,
+    Duration? poll = _pollInterval,
     void Function(String)? log,
   }) async {
     final build = (await api.getBuilds(version: version, buildNumber: buildNumber)).firstOrNull;
@@ -164,14 +174,14 @@ class AppStoreVersionManager {
       return build;
     }
 
-    log?.call('Waiting for build version $version ($build} to be processed');
+    log?.call('Waiting for build version $version ($buildNumber} to be processed');
     final startTime = DateTime.now();
 
     while (true) {
       await Future.delayed(poll);
       final duration = DateTime.now().difference(startTime);
 
-      log?.call('Waiting for build $version ($buildNumber) to be processed for $duration');
+      log?.call('Waiting for build $version ($buildNumber) to be processed for ${duration.toFormattedString()}');
       final build = (await api.getBuilds(version: version, buildNumber: buildNumber)).firstOrNull;
       if (build != null && build.processed) {
         return build;

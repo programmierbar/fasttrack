@@ -12,7 +12,7 @@ Future<void> main(List<String> args) async {
 
   final runner = CommandRunner('fasttrack', 'Forget crappy fastlane, here comes fasttrack!!!');
   if (config.appStore != null) {
-    runner.addCommand(AppStoreCommandGroup(config, context));
+    runner.addCommand(AppStoreCommandGroup(config.appStore!, config.metadata, context));
   }
   if (config.playStore != null) {
     runner.addCommand(PlayStoreCommandGroup(config.playStore!, context));

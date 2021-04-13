@@ -5,7 +5,7 @@ the **Google Play Store** or **Apple App Store**. It was designed to simplify th
 app versions, setting the release properties and controlling the rollout of app versions
 in multi app **Flutter** projects.
 
-It is heavily inspired by fastlane, but only supports the central aspects of fastlane to
+It is heavily inspired by fastlane, but only supports the central aspects of fastalane to
 control the app release process.
 
 ## Installation
@@ -31,7 +31,8 @@ flutter pub global run fasttrack:fasttrack "$@"
 
 ## Configuration
 
-All 
+Fasttracks expects its configuration in a `config.yaml` file located in the `fasttrack` directory in the project root 
+directory.
 
 ```yaml
 metadata:
@@ -63,12 +64,30 @@ playStore: # this section defines the Play Store related configuration
 ## Play Store commands
 
 Fasttrack provides a set of commands to control the release of apps against the Google PlayStore. 
-These commands can be addressed by calling fasttrack with `playstore` or `ps` sub command. To get
-list of all sub commands available on the `playstore` command, call the command with the `--help` option.
+These commands can be addressed by calling fasttrack with the `playstore` or `ps` sub command. To get
+a list of all sub commands available on the `playstore` command, call the command with the `--help` option.
 ```shell
 fastrack playstore --help
 ```
 
 ### Release status
 
-To get the release status 
+Get the release status of all configured apps from Play Store.
+
+```shell
+fastrack playstore status [--help] [--app] [--track] [--version] [--dry-run]
+```
+
+#### --app
+By default the fasttrack status command will get the release status for all defined Play Store apps. You 
+
+#### --version
+When running the command without parameters, fasttrack will get the release status for the version currently found
+in the `pubsepc.yaml` file of the project. When providing the `--version` or `-v` option, you can lookup the release
+status for a specific version. When specifying the `--version` option with `live`, you can lookup the release status 
+of the version currently live or in rollout.
+
+```shell
+fasttrack playstore status --version 3.16.1
+fasttrack ps status -v live
+```

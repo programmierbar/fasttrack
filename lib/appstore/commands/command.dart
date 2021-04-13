@@ -15,12 +15,11 @@ class AppStoreCommandGroup extends CommandGroup {
   final List<String> aliases = ['as'];
   final String description = 'Bundles all appstore related commands';
 
-  AppStoreCommandGroup(StoreConfig config, Context? context) : super(context) {
-    final store = config.appStore!;
+  AppStoreCommandGroup(AppStoreConfig store, MetadataConfig? metadata, Context? context) : super(context) {
     addCommands([
       AppStoreStatusCommand(store),
-      AppStorePrepareCommand(store, config.metadata),
-      AppStoreSubmitCommand(store),
+      AppStorePrepareCommand(store, metadata),
+      AppStoreSubmitCommand(store, metadata),
       AppStoreRolloutCommand(store)
     ]);
   }
