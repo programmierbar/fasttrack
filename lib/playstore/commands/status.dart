@@ -39,7 +39,7 @@ class PlayStoreStatusTask extends PlayStoreCommandTask {
   PlayStoreStatusTask({required this.version, required this.track});
 
   Future<void> run() async {
-    log('loading...');
+    log('loading status ${version != null ? 'for $version' : 'live version'}');
 
     final track = await api.get(track: this.track);
     final releases = track.releases;

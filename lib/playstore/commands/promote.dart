@@ -70,7 +70,7 @@ class PlayStorePromoteTask extends PlayStoreCommandTask {
     if (version != null) {
       release = releases.firstWhereOrNull((release) => release.name == version);
       if (release == null) {
-        return error('$track track does not have a release with version $version');
+        return error('$version does not exist on $track track');
       }
     } else {
       releases = releases.where((release) => release.status == 'completed');

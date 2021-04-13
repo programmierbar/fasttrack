@@ -21,8 +21,6 @@ class PlayStoreCommandGroup extends CommandGroup {
 }
 
 abstract class PlayStoreCommand extends Command {
-  static const appOption = 'app';
-  static const versionOption = 'version';
   static const trackOption = 'track';
   static const _dryRunFlag = 'dry-run';
 
@@ -30,7 +28,7 @@ abstract class PlayStoreCommand extends Command {
 
   PlayStoreCommand(this.config) {
     argParser.addMultiOption(
-      appOption,
+      Command.appOption,
       abbr: 'a',
       help: 'Run the command only for a set of apps. You can specify multiple apps by separating them by comma',
       allowed: config.ids,
@@ -43,8 +41,6 @@ abstract class PlayStoreCommand extends Command {
     );
   }
 
-  Iterable<String> get appIds => getList<String>(appOption)!;
-  String? get version => getParam(versionOption);
   String get track => getParam(trackOption);
   bool get dryRun => getParam(_dryRunFlag);
 
