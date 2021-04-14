@@ -9,6 +9,12 @@ class PlayStorePromoteCommand extends PlayStoreCommand {
 
   final name = 'promote';
   final description = 'Promote a release version from on track to another';
+  final checked = true;
+
+  String get prompt {
+    return 'Do you want to promote $version from $track to $_to an roll it out'
+        '${_rollout == 1 ? 'completely' : _rollout == 0 ? 'as draft' : 'to ${(_rollout * 100).round()}%'}?';
+  }
 
   PlayStorePromoteCommand(PlayStoreConfig config) : super(config) {
     argParser.addOption(
@@ -31,12 +37,15 @@ class PlayStorePromoteCommand extends PlayStoreCommand {
     );
   }
 
+  String get _to => getParam(_toOption);
+  double get _rollout => parseFraction(getParam(_rolloutOption)) ?? config.rollout;
+
   PlayStoreCommandTask setupTask() {
     return PlayStorePromoteTask(
       version: version,
       track: track,
-      to: getParam(_toOption),
-      rollout: parseFraction(getParam(_rolloutOption)) ?? config.rollout,
+      to: _to,
+      rollout: _rollout,
       dryRun: dryRun,
     );
   }

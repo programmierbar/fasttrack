@@ -21,8 +21,10 @@ Available subcommands:
   resume    Resumes a paused rollout
   complete  Completes a phased release and rolls out the version to all users''';
 
+  final checked = true;
+  String get prompt => 'Do you want to $_action the rollout for $version for ${appIds.join(',')}?';
+
   AppStoreRolloutCommand(AppStoreConfig config) : super(config) {
-    //addSubcommand(CommandDef('start', 'Starts the rollout of an release that is in "Pending for developer release" state'));
     argParser.addCommand('start');
     argParser.addCommand('pause');
     argParser.addCommand('resume');

@@ -32,6 +32,7 @@ abstract class Command extends args.Command {
     if (checked) {
       argParser.addFlag(
         checkFlag,
+        help: 'Whether a check prompt is shown to acknowledge the command',
         defaultsTo: true,
       );
     }

@@ -10,6 +10,9 @@ class AppStorePrepareCommand extends AppStoreCommand {
 This will either create a new version, if no editable version is available,
 or update the current editable version with the new version string''';
 
+  final checked = true;
+  String get prompt => 'Do you want to create the app store version $version for ${appIds.join(',')}?';
+
   AppStorePrepareCommand(AppStoreConfig store, MetadataConfig? metadata) : super(store, metadata);
 
   AppStoreCommandTask setupTask() {

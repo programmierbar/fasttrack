@@ -3,14 +3,18 @@ import 'package:fasttrack/playstore/commands/command.dart';
 import 'package:fasttrack/playstore/config.dart';
 
 class PlayStoreRolloutCommand extends PlayStoreCommand {
-  final name = 'update';
+  final name = 'rollout';
   final description = '''
 Update the rollout of app version
 
 Available subcommands:
   update    Update the rollout fraction for an active release, e.g. update 0.2
-  pause     Pauses the rollout of the current version
+  halt      Halts the rollout of the current version
   complete  Completes a release and rolls out the version to all users''';
+
+  final checked = true;
+  String get prompt => 'Do you want to $_action the rollout for ${appIds.join(',')} '
+      '${_fraction != null ? 'to ${(_fraction! * 100).round()}%' : ''}?';
 
   PlayStoreRolloutCommand(PlayStoreConfig config) : super(config) {
     argParser.addOption(
@@ -21,12 +25,12 @@ Available subcommands:
       defaultsTo: 'production',
     );
     argParser.addCommand('update');
-    argParser.addCommand('pause');
+    argParser.addCommand('halt');
     argParser.addCommand('complete');
   }
 
   String get _action => argResults!.command!.name!;
-  double? get _fraction => parseFraction(argResults!.rest.first) ?? config.rollout;
+  double? get _fraction => parseFraction(argResults!.command!.rest.first) ?? config.rollout;
 
   PlayStoreCommandTask setupTask() {
     return PlayStoreRolloutTask(
@@ -72,7 +76,7 @@ class PlayStoreRolloutTask extends PlayStoreCommandTask {
     if (action == 'complete') {
       release.status = 'completed';
       release.userFraction = null;
-    } else if (action == 'pause') {
+    } else if (action == 'halt') {
       if (release.status == 'halted') {
         return warning('${release.name} is already paused');
       }

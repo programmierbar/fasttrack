@@ -11,8 +11,8 @@ class AppStoreSubmitCommand extends AppStoreCommand {
 
   final name = 'submit';
   final description = 'Submit a app store version for review';
-  final checked = true;
 
+  final checked = true;
   String get prompt => 'Do you want to submit $version for ${appIds.join(',')} to review?';
 
   AppStoreSubmitCommand(AppStoreConfig config, MetadataConfig? metadata) : super(config, metadata) {
