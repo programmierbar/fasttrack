@@ -7,10 +7,11 @@ import 'package:fasttrack/common/metadata.dart';
 
 extension DurationExtension on Duration {
   String toFormattedString() {
-    return [inHours, inMinutes.remainder(60), inSeconds.remainder(60)]
-        .where((part) => part > 0)
-        .map((part) => part.toString().padLeft(2, '0'))
-        .join(':');
+    return [
+      if (inHours > 0) inHours,
+      inMinutes.remainder(60),
+      inSeconds.remainder(60).toString().padLeft(2, '0'),
+    ].join(':');
   }
 }
 

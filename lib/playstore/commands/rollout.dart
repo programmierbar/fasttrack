@@ -13,7 +13,7 @@ Available subcommands:
   complete  Completes a release and rolls out the version to all users''';
 
   final checked = true;
-  String get prompt => 'Do you want to $_action the rollout for ${appIds.join(',')} '
+  String get prompt => 'Do you want to $_action the rollout $version for ${appIds.join(',')} '
       '${_fraction != null ? 'to ${(_fraction! * 100).round()}%' : ''}?';
 
   PlayStoreRolloutCommand(PlayStoreConfig config) : super(config) {

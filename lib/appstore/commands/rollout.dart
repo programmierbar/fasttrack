@@ -1,14 +1,6 @@
-import 'package:args/command_runner.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
-
-class CommandDef extends Command {
-  final String name;
-  final String description;
-
-  CommandDef(this.name, this.description);
-}
 
 class AppStoreRolloutCommand extends AppStoreCommand {
   final name = 'rollout';

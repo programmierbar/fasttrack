@@ -12,7 +12,7 @@ class PlayStorePromoteCommand extends PlayStoreCommand {
   final checked = true;
 
   String get prompt {
-    return 'Do you want to promote $version from $track to $_to an roll it out'
+    return 'Do you want to promote $version from $track to $_to for ${appIds.join(',')} and roll it out '
         '${_rollout == 1 ? 'completely' : _rollout == 0 ? 'as draft' : 'to ${(_rollout * 100).round()}%'}?';
   }
 
