@@ -169,7 +169,7 @@ class AppStoreConnectClient {
     if (response.statusCode >= 200 && response.statusCode <= 299) {
       return ApiResponse(this, response);
     } else {
-      throw ApiException(response.statusCode, response.body);
+      throw ApiException.fromResponse(response);
     }
   }
 }
@@ -235,9 +235,28 @@ class ApiResponse {
 
 class ApiException {
   final int statusCode;
-  final String message;
+  final List<ApiError> errors;
 
-  ApiException(this.statusCode, this.message);
+  ApiException.fromResponse(Response response) : this.fromJson(response.statusCode, jsonDecode(response.body));
+  ApiException.fromJson(this.statusCode, Map<String, dynamic> json)
+      : errors = (json['errors'] as List).map((item) => ApiError.fromJson(item)).toList();
 
-  String toString() => '$statusCode: $message';
+  String toString() => '$statusCode: ${errors.first}';
+}
+
+class ApiError {
+  final String id;
+  final int status;
+  final String code;
+  final String title;
+  final String? detail;
+
+  ApiError.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        status = int.parse(json['status']),
+        code = json['code'],
+        title = json['title'],
+        detail = json['detail'];
+
+  String toString() => '$code ${detail ?? title}';
 }

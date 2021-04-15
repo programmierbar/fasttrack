@@ -1,5 +1,6 @@
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
+import 'package:fasttrack/appstore/connect_api/manager.dart';
 import 'package:fasttrack/appstore/connect_api/model.dart';
 
 class AppStoreRolloutCommand extends AppStoreCommand {
@@ -58,8 +59,7 @@ class AppStoreRolloutTask extends AppStoreCommandTask {
       // to scheduled and the release date to and date time in the past to switch the
       // app version from the pendingForDeveloperRelease to readyForSale state. see
       // https://github.com/fastlane/fastlane/discussions/18190#discussioncomment-492865
-      await manager.updateReleaseType(
-        version,
+      await version.updateReleaseType(
         releaseType: ReleaseType.scheduled,
         earliestReleaseDate: DateTime.now(),
       );
@@ -82,7 +82,7 @@ class AppStoreRolloutTask extends AppStoreCommandTask {
       state = PhasedReleaseState.complete;
     }
 
-    if (await manager.updateReleaseState(version, state)) {
+    if (await version.updateReleaseState(state)) {
       success('${this.version} rollout updated to ${state.toString().toLowerCase()}');
     } else {
       warning('${this.version} rollout already ${state.toString().toLowerCase()}');

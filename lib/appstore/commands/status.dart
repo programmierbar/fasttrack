@@ -14,11 +14,6 @@ currently live, provide --version live option to the command.''';
 
   AppStoreStatusCommand(AppStoreConfig config) : super(config);
 
-  String? get version {
-    final version = super.version;
-    return (version != 'live') ? version : null;
-  }
-
   AppStoreCommandTask setupTask() {
     return AppStoreStatusTask(version);
   }
@@ -31,12 +26,14 @@ class AppStoreStatusTask extends AppStoreCommandTask {
 
   Future<void> run() async {
     log('status loading');
-    final version = this.version != null //
-        ? await manager.getVersion(this.version!)
-        : await manager.liveVersion();
+    final version = this.version == 'live'
+        ? await manager.liveVersion()
+        : this.version == 'edit'
+            ? await manager.editVersion()
+            : await manager.getVersion(this.version!);
 
     if (version == null) {
-      return error(this.version == null ? 'no version available' : '${this.version} not available');
+      return error('no ${this.version} version available');
     }
 
     _print(version);
@@ -50,7 +47,17 @@ class AppStoreStatusTask extends AppStoreCommandTask {
     }
     if (version.appStoreState != AppStoreState.readyForSale) {
       parts.add(version.appStoreState.toString().toLowerCase());
-      color = StatusColor.warning;
+      if (version.appStoreState == AppStoreState.metadataRejected ||
+          version.appStoreState == AppStoreState.invalidBinary ||
+          version.appStoreState == AppStoreState.rejected) {
+        color = StatusColor.error;
+      } else if (version.appStoreState == AppStoreState.pendingDeveloperRelease ||
+          version.appStoreState == AppStoreState.pendingAppleRelease) {
+        color = StatusColor.success;
+      } else if (version.appStoreState == AppStoreState.waitingForReview ||
+          version.appStoreState == AppStoreState.inReview) {
+        color = StatusColor.warning;
+      }
     } else {
       final release = version.phasedRelease;
       if (release == null) {

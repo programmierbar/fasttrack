@@ -15,6 +15,86 @@ extension DurationExtension on Duration {
   }
 }
 
+extension AppStoreVersionExtension on AppStoreVersion {
+  Future<void> updateVersionString(String version) {
+    return update(AppStoreVersionAttributes(versionString: version));
+  }
+
+  Future<bool> updateReleaseType({required ReleaseType releaseType, DateTime? earliestReleaseDate}) async {
+    if (this.releaseType != releaseType) {
+      await update(AppStoreVersionAttributes(
+        releaseType: releaseType,
+        earliestReleaseDate: earliestReleaseDate,
+      ));
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> updatePhasedRelease({required bool phased}) async {
+    if (phased && phasedRelease == null) {
+      await setPhasedRelease(PhasedReleaseAttributes(
+        phasedReleaseState: PhasedReleaseState.inactive,
+      ));
+      return true;
+    }
+
+    if (!phased && phasedRelease != null) {
+      await phasedRelease!.delete();
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<bool> updateReleaseNotes(Map<String, String> releaseNotes) async {
+    final localizations = await getLocalizations();
+    final results = await Future.wait(localizations.map((localization) async {
+      final locale = localization.locale;
+      final lookup = releaseNotes.keys.firstWhereOrNull((key) => key.startsWith(locale));
+      if (lookup == null) {
+        throw TaskException('Releases notes for locale $locale is missing');
+      }
+
+      final whatsNew = releaseNotes[lookup];
+      if (localization.whatsNew != whatsNew) {
+        await localization.update(VersionLocalizationAttributes(whatsNew: whatsNew));
+        return true;
+      }
+
+      return false;
+    }));
+
+    return results.reduce((value, result) => value || result);
+  }
+
+  Future<bool> updateSubmission({required bool rejected}) async {
+    if (!rejected && submission == null) {
+      await addSubmission();
+      return true;
+    }
+
+    if (rejected && submission != null) {
+      if (!submission!.canReject) {
+        throw TaskException('$versionString can not be rejected anymore');
+      }
+      await submission!.delete();
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<bool> updateReleaseState(PhasedReleaseState state) async {
+    if (phasedRelease != null && phasedRelease!.phasedReleaseState != state) {
+      await phasedRelease!.update(PhasedReleaseAttributes(phasedReleaseState: state));
+      return true;
+    }
+
+    return false;
+  }
+}
+
 class AppStoreVersionManager {
   static const _platform = AppStorePlatform.iOS;
   static const _pollInterval = Duration(seconds: 15);
@@ -25,49 +105,19 @@ class AppStoreVersionManager {
   const AppStoreVersionManager(this.api, this.loader);
 
   Future<AppStoreVersion?> getVersion(String version) async {
-    return (await api.getVersions(versions: [version])).firstOrNull;
+    return (await api.getVersions(versions: [version], platforms: [_platform])).firstOrNull;
   }
 
   Future<AppStoreVersion?> liveVersion() async {
-    return (await api.getVersions(states: AppStoreState.liveStates)).firstOrNull;
+    return (await api.getVersions(states: AppStoreState.liveStates, platforms: [_platform])).firstOrNull;
   }
 
-  Future<AppStoreVersion> editVersion(String version) async {
-    final storeVersions = await api.getVersions(
-      states: AppStoreState.editStates,
-      platforms: [_platform],
-    );
-
-    if (storeVersions.isEmpty) {
-      return await api.postVersion(
-        attributes: AppStoreVersionAttributes(
-          versionString: version,
-          platform: _platform,
-        ),
-      );
-    }
-
-    final storeVersion = storeVersions.first;
-    if (storeVersion.versionString != version) {
-      await storeVersion.update(AppStoreVersionAttributes(versionString: version));
-    }
-
-    return storeVersion;
+  Future<AppStoreVersion?> editVersion() async {
+    return (await api.getVersions(states: AppStoreState.editStates, platforms: [_platform])).firstOrNull;
   }
 
-  Future<bool> updateReleaseType(
-    AppStoreVersion version, {
-    required ReleaseType releaseType,
-    DateTime? earliestReleaseDate,
-  }) async {
-    if (version.releaseType != releaseType) {
-      await version.update(AppStoreVersionAttributes(
-        releaseType: releaseType,
-        earliestReleaseDate: earliestReleaseDate,
-      ));
-      return true;
-    }
-    return false;
+  Future<AppStoreVersion> createVersion(String version) {
+    return api.postVersion(attributes: AppStoreVersionAttributes(versionString: version, platform: _platform));
   }
 
   Future<AppStoreVersion> awaitVersionInState({
@@ -92,76 +142,13 @@ class AppStoreVersionManager {
     }
   }
 
-  Future<bool> updatePhasedRelease(AppStoreVersion version, {required bool phased}) async {
-    final phasedRelease = version.phasedRelease;
-    if (phased && phasedRelease == null) {
-      await version.setPhasedRelease(PhasedReleaseAttributes(
-        phasedReleaseState: PhasedReleaseState.inactive,
-      ));
-      return true;
-    }
-
-    if (!phased && phasedRelease != null) {
-      await phasedRelease.delete();
-      return true;
-    }
-
-    return false;
-  }
-
   Future<bool> updateReleaseNotes(AppStoreVersion version) async {
     if (loader == null) {
       return false;
     }
 
     final releaseNotes = await loader!.load();
-    final localizations = await version.getLocalizations();
-
-    final results = await Future.wait(localizations.map((localization) async {
-      final locale = localization.locale;
-      final lookup = releaseNotes.keys.firstWhereOrNull((key) => key.startsWith(locale));
-      if (lookup == null) {
-        throw TaskException('Releases notes for locale $locale is missing');
-      }
-
-      final whatsNew = releaseNotes[lookup];
-      if (localization.whatsNew != whatsNew) {
-        await localization.update(VersionLocalizationAttributes(whatsNew: whatsNew));
-        return true;
-      }
-
-      return false;
-    }));
-
-    return results.reduce((value, result) => value || result);
-  }
-
-  Future<bool> updateSubmission(AppStoreVersion version, {required bool rejected}) async {
-    final submission = version.submission;
-    if (!rejected && submission == null) {
-      await version.addSubmission();
-      return true;
-    }
-
-    if (rejected && submission != null) {
-      if (!submission.canReject) {
-        throw TaskException('${version.versionString} can not be rejected anymore');
-      }
-      await submission.delete();
-      return true;
-    }
-
-    return false;
-  }
-
-  Future<bool> updateReleaseState(AppStoreVersion version, PhasedReleaseState state) async {
-    final release = version.phasedRelease;
-    if (release != null && release.phasedReleaseState != state) {
-      await release.update(PhasedReleaseAttributes(phasedReleaseState: state));
-      return true;
-    }
-
-    return false;
+    return version.updateReleaseNotes(releaseNotes);
   }
 
   Future<Build?> getBuild({

@@ -130,7 +130,7 @@ class AppStoreState {
   static const processingForAppStore = AppStoreState._('PROCESSING_FOR_APP_STORE');
   static const pendingDeveloperRelease = AppStoreState._('PENDING_DEVELOPER_RELEASE');
   static const pendingAppleRelease = AppStoreState._('PENDING_APPLE_RELEASE');
-  static const inReview = AppStoreState._('WAITING_FOR_REVIEW');
+  static const inReview = AppStoreState._('IN_REVIEW');
   static const waitingForReview = AppStoreState._('WAITING_FOR_REVIEW');
   static const developerRejected = AppStoreState._('DEVELOPER_REJECTED');
   static const developerRemovedFromSale = AppStoreState._('DEVELOPER_REMOVED_FROM_SALE');
@@ -155,11 +155,17 @@ class AppStoreState {
     waitingForReview,
     invalidBinary
   ];
+  static const rejectableStates = [
+    pendingAppleRelease,
+    pendingDeveloperRelease,
+    inReview,
+    waitingForReview,
+  ];
 
   final String _name;
   const AppStoreState._(this._name);
 
-  int get hashCode => _name.hashCode;
+  //int get hashCode => _name.hashCode;
   bool operator ==(dynamic other) => other is AppStoreState && other._name == _name;
   String toString() => _name;
 }
