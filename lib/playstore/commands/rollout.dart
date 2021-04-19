@@ -30,7 +30,7 @@ Available subcommands:
   }
 
   String get _action => argResults!.command!.name!;
-  double? get _fraction => parseFraction(argResults!.command!.rest.first) ?? config.rollout;
+  double? get _fraction => parseFraction(argResults!.command!.rest.firstOrNull) ?? config.rollout;
 
   PlayStoreCommandTask setupTask() {
     return PlayStoreRolloutTask(
