@@ -1,28 +1,28 @@
 # Fasttrack
 
 The fasttrack tool is a command line tool for controlling the release of app versions in 
-the **Google Play Store** or **Apple App Store**. It was designed to simplify the tasks fo creating
+the **Google Play Store** or **Apple App Store**. It was designed to simplify the tasks of creating
 app versions, setting the release properties and controlling the rollout of app versions
-in multi app **Flutter** projects.
+in multi-app **Flutter** projects.
 
-It is heavily inspired by fastlane, but only supports the central aspects of fastalane to
+It is heavily inspired by fastlane, but only supports the core aspects of fastlane to
 control the app release process.
 
 ## Installation
 
-Install the fasttrack tool to be globally available in your favorite cli.
+Install the fasttrack tool to be globally available in your favorite CLI:
 
 ```shell
 flutter pub global activate --source git https://github.com/lotum/fasttrack
 ```
 
-Add the bin cache of the pub tool to global path to your favorite cli startup script (e.g. `.zshrc`)
+Add the bin cache of the pub tool to global path to your favorite CLI startup script (e.g. `.zshrc`):
 
 ```shell
 export PATH="$PATH:$HOME/.pub-cache/bin:$HOME/<path-to-flutter-sdk>/.pub-cache/bin"
 ```
 
-Fix the dart executable shell entry point
+Fix the dart executable shell entry point:
 
 ```shell
 vi <path-to-flutter-sdk>/.pub-cache/bin/fasttrack
@@ -31,7 +31,7 @@ flutter pub global run fasttrack:fasttrack "$@"
 
 ## Configuration
 
-Fasttracks expects its configuration in a `config.yaml` file located in the `fasttrack` directory in the project root 
+fasttrack expects its configuration in a `config.yaml` file located in the `fasttrack` directory in the project root 
 directory.
 
 ```yaml
@@ -63,7 +63,7 @@ playStore: # this section defines the Play Store related configuration
 
 ## Play Store commands
 
-Fasttrack provides a set of commands to control the release of apps against the Google PlayStore. 
+fasttrack provides a set of commands to control the release of apps against the Google Play Store. 
 These commands can be addressed by calling fasttrack with the `playstore` or `ps` sub command. To get
 a list of all sub commands available on the `playstore` command, call the command with the `--help` option.
 ```shell
@@ -71,16 +71,16 @@ fastrack playstore --help
 ```
 
 ### --no-check
-All modifying commands will show a prompt to the user, that he has to acknowledge to execute the operation.
-For a CI/CD system you can suppress this prompt, by running the command with `--no-check` option.
+All modifying commands will show a prompt to the user, that they have to acknowledge to execute the operation.
+For a CI/CD system you can suppress this prompt by running the command with the `--no-check` option.
 
 #### --dry-run
 All Play Store commands provide the `--dry-run` flag, which can be used to validate the command against
-the Play Store api without actually performing a change.
+the Play Store API without actually performing a change.
 
 ### Release Status
 
-Get the release status of all configured apps from Play Store.
+Get the release status of all configured apps from Play Store:
 
 ```shell
 fastrack playstore status [--help] [--app] [--track] [--version] [--dry-run]
@@ -124,7 +124,7 @@ fasttrack playstore promote [--help] [--app] [--track=internal] [--to=production
 ```
 
 #### --app
-By default, the promote command will promote all defined apps from on track to another. You can specify
+By default, the promote command will promote all defined apps from one track to another. You can specify
 to promote only one or a set of apps by specifying the app ids the `--app` option.
 
 ```shell
@@ -133,7 +133,7 @@ fastrack ps promote -a id -a id2
 ```
 
 #### --track
-By default, fasttrack will promote the apps on the `internal` to `production` track. When you want to promote
+By default, fasttrack will promote the apps on the `internal` to the `production` track. When you want to promote
 an app from the `alpha` or `beta` track, specify the desired track with the `--track` option.
 
 ```shell
@@ -152,7 +152,7 @@ fastrack playstore promote --to alpha
 #### --version
 When running the promote command without parameters, fasttrack will promote the version currently found
 in the `pubsepc.yaml` file of the project. When providing the `--version` or `-v` option, you can promote
-specific version to another track.
+a specific version to another track.
 
 #### --rollout
 By default, fasttrack will release the app to the user fraction defined in the `rollout` parameter in

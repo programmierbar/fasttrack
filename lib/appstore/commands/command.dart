@@ -13,7 +13,7 @@ import 'package:fasttrack/common/metadata.dart';
 class AppStoreCommandGroup extends CommandGroup {
   final String name = 'appstore';
   final List<String> aliases = ['as'];
-  final String description = 'Bundles all appstore related commands';
+  final String description = 'Bundles all App Store related commands';
 
   AppStoreCommandGroup(AppStoreConfig store, MetadataConfig? metadata, Context? context) : super(context) {
     addCommands([

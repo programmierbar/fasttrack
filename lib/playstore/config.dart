@@ -21,7 +21,7 @@ class PlayStoreAppConfig extends PlayStoreReleaseConfig {
     } else if (data is String) {
       return PlayStoreAppConfig(id: id, appId: data, rollout: release?.rollout ?? 1);
     } else {
-      throw Exception('The data for an play store app is not an app id oder map');
+      throw Exception('The data for a Play Store app is not an app id or map');
     }
   }
 }

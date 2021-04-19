@@ -190,7 +190,7 @@ extension DateTimeExtension on DateTime {
   }
 }
 
-// no yet supported by app store connect api
+// no yet supported by App Store connect api
 /*class ReleaseRequest extends Model {
   static const type = 'appStoreVersionReleaseRequests';
   ReleaseRequest(String id) : super(type, id);

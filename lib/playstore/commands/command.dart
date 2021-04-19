@@ -9,7 +9,7 @@ import 'package:fasttrack/playstore/config.dart';
 class PlayStoreCommandGroup extends CommandGroup {
   final String name = 'playstore';
   final List<String> aliases = ['ps'];
-  final String description = 'Bundles all play store related commands';
+  final String description = 'Bundles all Play Store related commands';
 
   PlayStoreCommandGroup(PlayStoreConfig config, Context? context) : super(context) {
     addCommands([

@@ -6,13 +6,13 @@ import 'package:fasttrack/common/config.dart';
 
 class AppStorePrepareCommand extends AppStoreCommand {
   final name = 'prepare';
-  final description = '''Prepare new app store version.
+  final description = '''Prepare a new App Store version.
   
-This will either create a new version, if no editable version is available,
+This will either create a new version, if no editable version is available
 or update the current editable version with the new version string''';
 
   final checked = true;
-  String get prompt => 'Do you want to create the app store version $version for ${appIds.join(',')}?';
+  String get prompt => 'Do you want to create the App Store version $version for ${appIds.join(',')}?';
 
   AppStorePrepareCommand(AppStoreConfig store, MetadataConfig? metadata) : super(store, metadata);
 

@@ -53,7 +53,7 @@ extension AppStoreVersionExtension on AppStoreVersion {
       final locale = localization.locale;
       final lookup = releaseNotes.keys.firstWhereOrNull((key) => key.startsWith(locale));
       if (lookup == null) {
-        throw TaskException('Releases notes for locale $locale is missing');
+        throw TaskException('Releases notes for locale $locale missing');
       }
 
       final whatsNew = releaseNotes[lookup];
@@ -162,7 +162,7 @@ class AppStoreVersionManager {
       return build;
     }
 
-    log?.call('Waiting for build version $version ($buildNumber} to be processed');
+    log?.call('Waiting for build version $version ($buildNumber) to be processed');
     final startTime = DateTime.now();
 
     while (true) {
