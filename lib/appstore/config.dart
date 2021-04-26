@@ -42,7 +42,7 @@ class AppStoreAppConfig extends AppStoreReleaseConfig {
         manual: release?.manual ?? false,
       );
     } else {
-      throw Exception('The data for the app store config is neither an app id or an map');
+      throw Exception('The data for the App Store config is neither an app id or a map');
     }
   }
 }

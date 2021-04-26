@@ -5,7 +5,7 @@ import 'package:fasttrack/playstore/config.dart';
 class PlayStoreRolloutCommand extends PlayStoreCommand {
   final name = 'rollout';
   final description = '''
-Update the rollout of app version
+Update the rollout of an app version.
 
 Available subcommands:
   update    Update the rollout fraction for an active release, e.g. update 0.2

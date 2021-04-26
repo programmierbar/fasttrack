@@ -6,11 +6,11 @@ import 'package:fasttrack/common/command.dart';
 class AppStoreStatusCommand extends AppStoreCommand {
   final name = 'status';
   final description = '''
-Get the status of all versions in the appstore
+Get the status of all versions in the App Store.
 
-If no explicit version is specified, the command takes the version string found in the pubspec yaml
-and reads the status of that version from the appstore. To get the status of the versions that are 
-currently live, provide --version live option to the command.''';
+If no explicit version is specified, the command takes the version string found in the pubspec.yaml
+and reads the status of that version from the App Store. To get the status of the versions that are 
+currently live, provide "--version live" option to the command.''';
 
   AppStoreStatusCommand(AppStoreConfig config) : super(config);
 

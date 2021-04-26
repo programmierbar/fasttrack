@@ -11,7 +11,7 @@ class AppStoreSubmitCommand extends AppStoreCommand {
   static const _rejectFlag = 'reject';
 
   final name = 'submit';
-  final description = 'Submit a app store version for review';
+  final description = 'Submit an App Store version for review';
   final checked = true;
 
   String get prompt {
@@ -24,18 +24,18 @@ class AppStoreSubmitCommand extends AppStoreCommand {
     argParser.addOption(
       _buildOption,
       abbr: 'b',
-      help: 'The build number to attach to the app store version',
+      help: 'The build number to attach to the App Store version',
     );
     argParser.addFlag(
       _manualFlag,
       abbr: 'm',
-      help: 'Whether to manual release after approval',
+      help: 'Whether to manually release after approval',
       defaultsTo: null,
     );
     argParser.addFlag(
       _phasedFlag,
       abbr: 'p',
-      help: 'Whether to do a phased release for the app store version',
+      help: 'Whether to do a phased release for the App Store version',
       defaultsTo: null,
     );
     argParser.addFlag(

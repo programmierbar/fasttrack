@@ -6,11 +6,11 @@ import 'package:fasttrack/appstore/connect_api/model.dart';
 class AppStoreRolloutCommand extends AppStoreCommand {
   final name = 'rollout';
   final description = '''
-Update an version in phased release
+Update a version in phased release.
   
 Available subcommands:
-  start     Start rollout of an version in pending developer release state
-  pause     Pauses the rollout of an version currently in phased release
+  start     Start rollout of a version in pending developer release state
+  pause     Pauses the rollout of a version currently in phased release
   resume    Resumes a paused rollout
   complete  Completes a phased release and rolls out the version to all users''';
 
@@ -54,7 +54,7 @@ class AppStoreRolloutTask extends AppStoreCommandTask {
     }
 
     if (version.appStoreState == AppStoreState.pendingDeveloperRelease) {
-      // the app store connect api does not provide the 'appStoreVersionReleaseRequests'
+      // the App Store connect api does not provide the 'appStoreVersionReleaseRequests'
       // endpoint. therefore we have to use a hacky workaround to set the release type
       // to scheduled and the release date to and date time in the past to switch the
       // app version from the pendingForDeveloperRelease to readyForSale state. see

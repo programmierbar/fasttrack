@@ -8,7 +8,7 @@ class PlayStorePromoteCommand extends PlayStoreCommand {
   static const _rolloutOption = 'rollout';
 
   final name = 'promote';
-  final description = 'Promote a release version from on track to another';
+  final description = 'Promote a release version from one track to another';
   final checked = true;
 
   String get prompt {
