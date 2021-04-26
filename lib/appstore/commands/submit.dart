@@ -79,7 +79,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
   Future<void> run() async {
     log('${this.version} submit for review');
     final version = await manager.editVersion() ?? //
-        await manager.liveVersion() ??
+        //await manager.liveVersion() ??
         await manager.createVersion(this.version);
 
     if (AppStoreState.rejectableStates.contains(version.appStoreState)) {
