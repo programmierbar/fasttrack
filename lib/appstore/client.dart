@@ -1,7 +1,5 @@
+import 'package:appstore_connect/appstore_connect.dart';
 import 'package:collection/collection.dart';
-import 'package:fasttrack/appstore/connect_api/client.dart';
-import 'package:fasttrack/appstore/connect_api/model.dart';
-import 'package:fasttrack/appstore/connect_api/model/version.dart';
 import 'package:fasttrack/common/command.dart';
 import 'package:fasttrack/common/metadata.dart';
 
@@ -95,14 +93,14 @@ extension AppStoreVersionExtension on AppStoreVersion {
   }
 }
 
-class AppStoreVersionManager {
+class AppStoreApiClient {
   static const _platform = AppStorePlatform.iOS;
   static const _pollInterval = Duration(seconds: 15);
 
   final AppStoreConnectApi api;
   final ReleaseNotesLoader? loader;
 
-  const AppStoreVersionManager(this.api, this.loader);
+  const AppStoreApiClient(this.api, this.loader);
 
   Future<AppStoreVersion?> getVersion(String version) async {
     return (await api.getVersions(versions: [version], platforms: [_platform])).firstOrNull;

@@ -1,3 +1,4 @@
+import 'package:appstore_connect/appstore_connect.dart';
 import 'package:fasttrack/common/config.dart';
 import 'package:yaml/yaml.dart';
 
@@ -47,21 +48,13 @@ class AppStoreAppConfig extends AppStoreReleaseConfig {
   }
 }
 
-class AppStoreCredentialsConfig {
-  final String keyId;
-  final String issuerId;
-  final String keyFile;
-
-  const AppStoreCredentialsConfig({
-    required this.keyId,
-    required this.issuerId,
-    required this.keyFile,
-  });
-
+class AppStoreCredentialsConfig extends AppStoreConnectCredentials {
   AppStoreCredentialsConfig.fromYaml(YamlMap map)
-      : keyId = map['keyId'],
-        issuerId = map['issuerId'],
-        keyFile = resolvePath(map['keyFile'], './fasttrack/credentials');
+      : super(
+          keyId: map['keyId'],
+          issuerId: map['issuerId'],
+          keyFile: resolvePath(map['keyFile'], './fasttrack/credentials'),
+        );
 }
 
 class AppStoreConfig {

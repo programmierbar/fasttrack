@@ -1,10 +1,10 @@
+import 'package:appstore_connect/appstore_connect.dart';
+import 'package:fasttrack/appstore/client.dart';
 import 'package:fasttrack/appstore/commands/prepare.dart';
 import 'package:fasttrack/appstore/commands/rollout.dart';
 import 'package:fasttrack/appstore/commands/status.dart';
 import 'package:fasttrack/appstore/commands/submit.dart';
 import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/appstore/connect_api/client.dart';
-import 'package:fasttrack/appstore/connect_api/manager.dart';
 import 'package:fasttrack/common/command.dart';
 import 'package:fasttrack/common/config.dart';
 import 'package:fasttrack/common/context.dart';
@@ -49,7 +49,7 @@ abstract class AppStoreCommand extends Command {
       final app = store.apps[id]!;
       return setupTask()
         ..config = app
-        ..manager = AppStoreVersionManager(
+        ..client = AppStoreApiClient(
           AppStoreConnectApi(client, app.appId),
           loader,
         );
@@ -61,7 +61,7 @@ abstract class AppStoreCommand extends Command {
 
 abstract class AppStoreCommandTask extends CommandTask {
   late final AppStoreAppConfig config;
-  late final AppStoreVersionManager manager;
+  late final AppStoreApiClient client;
 
   String get id => config.id;
 }

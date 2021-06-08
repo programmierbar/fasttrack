@@ -1,6 +1,6 @@
+import 'package:appstore_connect/appstore_connect.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/common/command.dart';
 
 class AppStoreStatusCommand extends AppStoreCommand {
@@ -27,10 +27,10 @@ class AppStoreStatusTask extends AppStoreCommandTask {
   Future<void> run() async {
     log('status loading');
     final version = this.version == 'live'
-        ? await manager.liveVersion()
+        ? await client.liveVersion()
         : this.version == 'edit'
-            ? await manager.editVersion()
-            : await manager.getVersion(this.version!);
+            ? await client.editVersion()
+            : await client.getVersion(this.version!);
 
     if (version == null) {
       return error('no ${this.version} version available');

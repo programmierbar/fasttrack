@@ -10,7 +10,7 @@ Future<void> main(List<String> args) async {
   final config = await StoreConfig.load('.');
   final context = await Context.setup('.');
 
-  final runner = CommandRunner('fasttrack', 'Forget crappy fastlane, here comes fasttrack!!!');
+  final runner = CommandRunner('fasttrack', 'Control the release process for your Flutter apps');
   if (config.appStore != null) {
     runner.addCommand(AppStoreCommandGroup(config.appStore!, config.metadata, context));
   }

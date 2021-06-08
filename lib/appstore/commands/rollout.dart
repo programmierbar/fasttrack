@@ -1,7 +1,7 @@
+import 'package:appstore_connect/appstore_connect.dart';
+import 'package:fasttrack/appstore/client.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/appstore/connect_api/manager.dart';
-import 'package:fasttrack/appstore/connect_api/model.dart';
 
 class AppStoreRolloutCommand extends AppStoreCommand {
   final name = 'rollout';
@@ -46,8 +46,8 @@ class AppStoreRolloutTask extends AppStoreCommandTask {
     log('${this.version} rollout update');
 
     var version = this.version != null //
-        ? await manager.getVersion(this.version!)
-        : await manager.liveVersion();
+        ? await client.getVersion(this.version!)
+        : await client.liveVersion();
 
     if (version == null) {
       return error('${this.version} not found');
@@ -64,7 +64,7 @@ class AppStoreRolloutTask extends AppStoreCommandTask {
         earliestReleaseDate: DateTime.now(),
       );
 
-      version = await manager.awaitVersionInState(
+      version = await client.awaitVersionInState(
         version: version.versionString,
         state: AppStoreState.readyForSale,
         log: log,

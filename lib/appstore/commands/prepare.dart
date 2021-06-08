@@ -1,6 +1,6 @@
+import 'package:fasttrack/appstore/client.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/appstore/connect_api/manager.dart';
 import 'package:fasttrack/common/command.dart';
 import 'package:fasttrack/common/config.dart';
 
@@ -31,11 +31,11 @@ class AppStorePrepareTask extends AppStoreCommandTask {
 
   Future<void> run() async {
     log('${this.version} preparation');
-    final version = await manager.editVersion() ?? await manager.createVersion(this.version);
+    final version = await client.editVersion() ?? await client.createVersion(this.version);
     if (version.versionString != this.version) {
       await version.updateVersionString(this.version);
     }
-    await manager.updateReleaseNotes(version);
+    await client.updateReleaseNotes(version);
     success('${this.version} preparation completed');
   }
 }

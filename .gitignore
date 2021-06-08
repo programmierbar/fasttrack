@@ -8,8 +8,6 @@
 
 # Conventional directory for build outputs
 build/
-fasttrack/
-fasttrack/
 
 # Directory created by dartdoc
 doc/api/

@@ -1,7 +1,7 @@
+import 'package:appstore_connect/appstore_connect.dart';
+import 'package:fasttrack/appstore/client.dart';
 import 'package:fasttrack/appstore/commands/command.dart';
 import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/appstore/connect_api/manager.dart';
-import 'package:fasttrack/appstore/connect_api/model.dart';
 import 'package:fasttrack/common/config.dart';
 
 class AppStoreSubmitCommand extends AppStoreCommand {
@@ -78,9 +78,9 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
 
   Future<void> run() async {
     log('${this.version} submit for review');
-    final version = await manager.editVersion() ?? //
+    final version = await client.editVersion() ?? //
         //await manager.liveVersion() ??
-        await manager.createVersion(this.version);
+        await client.createVersion(this.version);
 
     if (AppStoreState.rejectableStates.contains(version.appStoreState)) {
       // if the current editable version is already in pending developer release state,
@@ -109,13 +109,13 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
       log('updated phased release to $phased');
     }
 
-    if (await manager.updateReleaseNotes(version)) {
+    if (await client.updateReleaseNotes(version)) {
       log('updated release notes');
     }
 
     var build = version.build;
     if (build == null || build.version != this.build) {
-      build = await manager.getBuild(version: version.versionString, buildNumber: this.build, log: log);
+      build = await client.getBuild(version: version.versionString, buildNumber: this.build, log: log);
       if (build == null) {
         return error('The requested build ${version.versionString} ${this.build} was not found');
       } else if (!build.valid) {
