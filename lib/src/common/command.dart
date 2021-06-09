@@ -1,6 +1,6 @@
 import 'package:args/command_runner.dart' as args;
 import 'package:dart_console/dart_console.dart';
-import 'package:fasttrack/common/context.dart';
+import 'package:fasttrack/src/common/context.dart';
 
 abstract class CommandGroup extends args.Command {
   final Context? context;

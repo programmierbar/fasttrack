@@ -1,7 +1,7 @@
 import 'package:appstore_connect/appstore_connect.dart';
-import 'package:fasttrack/appstore/commands/command.dart';
-import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/common/command.dart';
+import 'package:fasttrack/src/appstore/commands/command.dart';
+import 'package:fasttrack/src/appstore/config.dart';
+import 'package:fasttrack/src/common/command.dart';
 
 class AppStoreStatusCommand extends AppStoreCommand {
   final name = 'status';

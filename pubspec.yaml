@@ -11,9 +11,11 @@ executables:
 
 dependencies:
   args: ^2.1.1
-  yaml: ^3.1.0
+  appstore_connect: ^0.1.0
+  collection: ^1.15.0
+  dart_console: ^1.0.0
   googleapis: ^3.0.0
   googleapis_auth: ^1.1.0
-  dart_console: ^1.0.0
-  appstore_connect: ^0.1.0
+  path: ^1.8.0
+  yaml: ^3.1.0
 

@@ -1,14 +1,14 @@
 import 'package:appstore_connect/appstore_connect.dart';
-import 'package:fasttrack/appstore/client.dart';
-import 'package:fasttrack/appstore/commands/prepare.dart';
-import 'package:fasttrack/appstore/commands/rollout.dart';
-import 'package:fasttrack/appstore/commands/status.dart';
-import 'package:fasttrack/appstore/commands/submit.dart';
-import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/common/command.dart';
-import 'package:fasttrack/common/config.dart';
-import 'package:fasttrack/common/context.dart';
-import 'package:fasttrack/common/metadata.dart';
+import 'package:fasttrack/src/appstore/client.dart';
+import 'package:fasttrack/src/appstore/commands/prepare.dart';
+import 'package:fasttrack/src/appstore/commands/rollout.dart';
+import 'package:fasttrack/src/appstore/commands/status.dart';
+import 'package:fasttrack/src/appstore/commands/submit.dart';
+import 'package:fasttrack/src/appstore/config.dart';
+import 'package:fasttrack/src/common/command.dart';
+import 'package:fasttrack/src/common/config.dart';
+import 'package:fasttrack/src/common/context.dart';
+import 'package:fasttrack/src/common/metadata.dart';
 
 class AppStoreCommandGroup extends CommandGroup {
   final String name = 'appstore';

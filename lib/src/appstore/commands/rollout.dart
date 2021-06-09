@@ -1,7 +1,7 @@
 import 'package:appstore_connect/appstore_connect.dart';
-import 'package:fasttrack/appstore/client.dart';
-import 'package:fasttrack/appstore/commands/command.dart';
-import 'package:fasttrack/appstore/config.dart';
+import 'package:fasttrack/src/appstore/client.dart';
+import 'package:fasttrack/src/appstore/commands/command.dart';
+import 'package:fasttrack/src/appstore/config.dart';
 
 class AppStoreRolloutCommand extends AppStoreCommand {
   final name = 'rollout';

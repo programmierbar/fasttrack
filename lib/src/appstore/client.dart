@@ -1,7 +1,7 @@
 import 'package:appstore_connect/appstore_connect.dart';
 import 'package:collection/collection.dart';
-import 'package:fasttrack/common/command.dart';
-import 'package:fasttrack/common/metadata.dart';
+import 'package:fasttrack/src/common/command.dart';
+import 'package:fasttrack/src/common/metadata.dart';
 
 extension DurationExtension on Duration {
   String toFormattedString() {

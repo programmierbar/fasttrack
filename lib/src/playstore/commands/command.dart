@@ -1,10 +1,10 @@
-import 'package:fasttrack/common/command.dart';
-import 'package:fasttrack/common/context.dart';
-import 'package:fasttrack/playstore/client.dart';
-import 'package:fasttrack/playstore/commands/promote.dart';
-import 'package:fasttrack/playstore/commands/rollout.dart';
-import 'package:fasttrack/playstore/commands/status.dart';
-import 'package:fasttrack/playstore/config.dart';
+import 'package:fasttrack/src/common/command.dart';
+import 'package:fasttrack/src/common/context.dart';
+import 'package:fasttrack/src/playstore/client.dart';
+import 'package:fasttrack/src/playstore/commands/promote.dart';
+import 'package:fasttrack/src/playstore/commands/rollout.dart';
+import 'package:fasttrack/src/playstore/commands/status.dart';
+import 'package:fasttrack/src/playstore/config.dart';
 
 class PlayStoreCommandGroup extends CommandGroup {
   final String name = 'playstore';

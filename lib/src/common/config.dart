@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/playstore/config.dart';
+import 'package:fasttrack/src/appstore/config.dart';
+import 'package:fasttrack/src/playstore/config.dart';
 import 'package:path/path.dart';
 import 'package:yaml/yaml.dart';
 

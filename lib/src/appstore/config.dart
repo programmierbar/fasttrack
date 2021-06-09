@@ -1,5 +1,5 @@
 import 'package:appstore_connect/appstore_connect.dart';
-import 'package:fasttrack/common/config.dart';
+import 'package:fasttrack/src/common/config.dart';
 import 'package:yaml/yaml.dart';
 
 class AppStoreReleaseConfig {

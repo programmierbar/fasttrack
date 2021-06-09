@@ -1,8 +1,8 @@
-import 'package:fasttrack/appstore/client.dart';
-import 'package:fasttrack/appstore/commands/command.dart';
-import 'package:fasttrack/appstore/config.dart';
-import 'package:fasttrack/common/command.dart';
-import 'package:fasttrack/common/config.dart';
+import 'package:fasttrack/src/appstore/client.dart';
+import 'package:fasttrack/src/appstore/commands/command.dart';
+import 'package:fasttrack/src/appstore/config.dart';
+import 'package:fasttrack/src/common/command.dart';
+import 'package:fasttrack/src/common/config.dart';
 
 class AppStorePrepareCommand extends AppStoreCommand {
   final name = 'prepare';

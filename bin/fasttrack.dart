@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:fasttrack/appstore/commands/command.dart';
-import 'package:fasttrack/common/config.dart';
-import 'package:fasttrack/common/context.dart';
-import 'package:fasttrack/playstore/commands/command.dart';
+import 'package:fasttrack/src/appstore/commands/command.dart';
+import 'package:fasttrack/src/common/config.dart';
+import 'package:fasttrack/src/common/context.dart';
+import 'package:fasttrack/src/playstore/commands/command.dart';
 
 Future<void> main(List<String> args) async {
   final config = await StoreConfig.load('.');

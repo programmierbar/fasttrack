@@ -1,3 +1,6 @@
+# Files and directories created by operating system
+.DS_Store
+
 # Files and directories created by IntelliJ
 .idea/
 *.iml

@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:fasttrack/playstore/commands/command.dart';
-import 'package:fasttrack/playstore/config.dart';
+import 'package:fasttrack/src/playstore/commands/command.dart';
+import 'package:fasttrack/src/playstore/config.dart';
 import 'package:googleapis/androidpublisher/v3.dart';
 
 class PlayStorePromoteCommand extends PlayStoreCommand {
