@@ -10,23 +10,10 @@ control the app release process.
 
 ## Installation
 
-Install the fasttrack tool to be globally available in your favorite CLI:
+Install the fasttrack tool to be globally available in your favorite CLI
 
 ```shell
-flutter pub global activate --source git https://github.com/lotum/fasttrack
-```
-
-Add the bin cache of the pub tool to global path to your favorite CLI startup script (e.g. `.zshrc`):
-
-```shell
-export PATH="$PATH:$HOME/.pub-cache/bin:$HOME/<path-to-flutter-sdk>/.pub-cache/bin"
-```
-
-Fix the dart executable shell entry point:
-
-```shell
-vi <path-to-flutter-sdk>/.pub-cache/bin/fasttrack
-flutter pub global run fasttrack:fasttrack "$@"
+dart pub global activate fastrack
 ```
 
 ## Configuration

@@ -52,7 +52,7 @@ abstract class PlayStoreCommand extends Command {
       final app = config.apps[id]!;
       return setupTask()
         ..config = app
-        ..api = client.getTrackApi(packageName: app.appId);
+        ..api = client.getTrackApi(packageName: app.packageName);
     }).toList();
   }
 

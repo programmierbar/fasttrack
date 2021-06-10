@@ -1,5 +1,6 @@
 import 'package:args/command_runner.dart' as args;
 import 'package:dart_console/dart_console.dart';
+import 'package:fasttrack/src/common/config.dart';
 import 'package:fasttrack/src/common/context.dart';
 
 abstract class CommandGroup extends args.Command {
@@ -114,7 +115,8 @@ abstract class CommandTask {
   void success(String text) => log(text, color: StatusColor.success);
   void warning(String text) => log(text, color: StatusColor.warning);
   void error(String text) => log(text, color: StatusColor.error);
-  void log(String text, {StatusColor color = StatusColor.info}) => _logger.write('$id: $text', color: color);
+  void log(String text, {StatusColor color = StatusColor.info}) =>
+      _logger.write(id == DefaultAppId ? text : '$id: $text', color: color);
 }
 
 class TaskException implements Exception {

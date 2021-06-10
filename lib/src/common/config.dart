@@ -5,6 +5,8 @@ import 'package:fasttrack/src/playstore/config.dart';
 import 'package:path/path.dart';
 import 'package:yaml/yaml.dart';
 
+const DefaultAppId = 'default';
+
 class StoreConfig {
   static Future<StoreConfig> load(String path) async {
     final file = File('$path/fasttrack/config.yaml');
