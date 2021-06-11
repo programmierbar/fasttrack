@@ -57,9 +57,9 @@ playStore: # this section defines the Play Store related configuration
   keyFile: auth_key.json # the authentication for the Google Play Store service user in json format
   rollout: 0.1 # the initial rollout fraction when promoting an app version to the release track 
   apps: # the app specific release configurations
-    id: application.id # either you can specify the application id directly and use the default release configuration
+    id: package.name.1 # either you can specify the application id directly and use the default release configuration
     id2: # or you can override the rollout fraction per app
-      appId: application2.id
+      packageName: package.name.2
       rollout: 0.2
 ```
 
