@@ -28,7 +28,7 @@ control the final steps of the app release process.
 Install the fasttrack tool to be globally available on the command line
 
 ```shell
-dart pub global activate fastrack
+dart pub global activate fasttrack
 ```
 
 ## Configuration
