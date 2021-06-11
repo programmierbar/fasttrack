@@ -102,16 +102,20 @@ class AppStoreApiClient {
 
   const AppStoreApiClient(this.api, this.loader);
 
-  Future<AppStoreVersion?> getVersion(String version) async {
-    return (await api.getVersions(versions: [version], platforms: [_platform])).firstOrNull;
+  Future<AppStoreVersion?> getVersion(String version) {
+    return _getVersion(versions: [version]);
   }
 
-  Future<AppStoreVersion?> liveVersion() async {
-    return (await api.getVersions(states: AppStoreState.liveStates, platforms: [_platform])).firstOrNull;
+  Future<AppStoreVersion?> liveVersion() {
+    return _getVersion(states: AppStoreState.liveStates);
   }
 
-  Future<AppStoreVersion?> editVersion() async {
-    return (await api.getVersions(states: AppStoreState.editStates, platforms: [_platform])).firstOrNull;
+  Future<AppStoreVersion?> editVersion() {
+    return _getVersion(states: [...AppStoreState.editStates, AppStoreState.pendingDeveloperRelease]);
+  }
+
+  Future<AppStoreVersion?> _getVersion({List<String>? versions, List<AppStoreState>? states}) async {
+    return (await api.getVersions(versions: versions, states: states, platforms: [_platform])).firstOrNull;
   }
 
   Future<AppStoreVersion> createVersion(String version) {

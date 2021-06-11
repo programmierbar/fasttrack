@@ -78,9 +78,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
 
   Future<void> run() async {
     log('${this.version} submit for review');
-    final version = await client.editVersion() ?? //
-        //await manager.liveVersion() ??
-        await client.createVersion(this.version);
+    final version = await client.editVersion() ?? await client.createVersion(this.version);
 
     if (AppStoreState.rejectableStates.contains(version.appStoreState)) {
       // if the current editable version is already in pending developer release state,
