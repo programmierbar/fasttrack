@@ -1,3 +1,6 @@
+<img src="https://repository-images.githubusercontent.com/350715488/4c0f1c00-d421-11eb-9e6f-e941569175c4" alt="FastTrack"
+	title="Simplify your Flutter app deployment" width="480" height="240" />
+
 # Fasttrack
 
 Fasttrack is a command line tool for controlling the release of app versions in 
