@@ -10,7 +10,7 @@ Update a version in phased release.
   
 Available subcommands:
   start     Start rollout of a version in pending developer release state
-  pause     Pauses the rollout of a version currently in phased release
+  halt      Halts the rollout of a version currently in phased release
   resume    Resumes a paused rollout
   complete  Completes a phased release and rolls out the version to all users''';
 
@@ -19,7 +19,7 @@ Available subcommands:
 
   AppStoreRolloutCommand(AppStoreConfig config) : super(config) {
     argParser.addCommand('start');
-    argParser.addCommand('pause');
+    argParser.addCommand('halt');
     argParser.addCommand('resume');
     argParser.addCommand('complete');
   }
@@ -76,7 +76,7 @@ class AppStoreRolloutTask extends AppStoreCommandTask {
     }
 
     var state = PhasedReleaseState.active;
-    if (action == 'paused') {
+    if (action == 'halt') {
       state = PhasedReleaseState.paused;
     } else if (action == 'complete') {
       state = PhasedReleaseState.complete;
