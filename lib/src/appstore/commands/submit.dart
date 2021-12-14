@@ -93,8 +93,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
       }
     }
 
-    if (version.versionString != this.version) {
-      await version.updateVersionString(this.version);
+    if (await version.updateVersionString(this.version)) {
       log('update editable version to ${this.version}');
     }
 
