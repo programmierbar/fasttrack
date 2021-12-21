@@ -14,8 +14,12 @@ extension DurationExtension on Duration {
 }
 
 extension AppStoreVersionExtension on AppStoreVersion {
-  Future<void> updateVersionString(String version) {
-    return update(AppStoreVersionAttributes(versionString: version));
+  Future<bool> updateVersionString(String version) async {
+    if (versionString != version) {
+      await update(AppStoreVersionAttributes(versionString: version));
+      return true;
+    }
+    return false;
   }
 
   Future<bool> updateReleaseType({required ReleaseType releaseType, DateTime? earliestReleaseDate}) async {
