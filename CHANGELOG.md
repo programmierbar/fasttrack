@@ -1,3 +1,6 @@
+# 0.1.5
+* Fix usage of releaseType in appstore_connect
+
 # 0.1.3
 * Fix halting of rollouts of app store versions
 

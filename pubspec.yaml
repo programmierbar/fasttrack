@@ -1,6 +1,6 @@
 name: fasttrack
 description: Release tool for multi app flutter projects
-version: 0.1.4
+version: 0.1.5
 homepage: https://github.com/programmierbar/fasttrack
 
 environment:
@@ -11,7 +11,7 @@ executables:
 
 dependencies:
   args: ^2.3.0
-  appstore_connect: ^0.1.1
+  appstore_connect: ^0.1.2
   collection: ^1.15.0
   dart_console: ^1.0.0
   googleapis: ^7.0.0
