@@ -83,7 +83,7 @@ fastrack appstore status --app id
 fastrack playstore status -a id
 ```
 
-Fasttrack will use the version and build number found in the version property of project's pubspec.yaml file.
+Fasttrack will use the version and build number found in the version property of project's `pubspec.yaml` file.
 You can always run a command against a specific version, by defining the version with the `--version` or `-v`
 parameter.
 
@@ -107,7 +107,7 @@ fastrack playstore status [--help] [--app] [--version] [--track] [--dry-run]
 ```
 
 When running the command without parameters, fasttrack will get the release status for the version currently found
-in the `pubsepc.yaml` file of the project. When providing the `--version` or `-v` option, you can lookup the release
+in the `pubspec.yaml` file of the project. When providing the `--version` or `-v` option, you can lookup the release
 status for a specific version. When specifying the `--version` option with `live`, you can lookup the release status 
 of the version currently live or in rollout.
 
