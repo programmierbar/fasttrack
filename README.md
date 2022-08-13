@@ -4,7 +4,7 @@
 # Fasttrack
 
 Fasttrack is a command line tool for controlling the release of app versions in 
-the **Google Play Store** or **Apple App Store**. It was build to simplify the tasks of creating
+the **Google Play Store** or **Apple App Store**. It was built to simplify the tasks of creating
 app versions, setting the release properties and controlling the rollout of app versions
 in multi-app **Flutter** projects.
 
@@ -107,8 +107,8 @@ fastrack playstore status [--help] [--app] [--version] [--track] [--dry-run]
 ```
 
 When running the command without parameters, fasttrack will get the release status for the version currently found
-in the `pubsepc.yaml` file of the project. When providing the `--version` or `-v` option, you can lookup the release
-status for a specific version. When specifying the `--version` option with `live`, you can lookup the release status 
+in the `pubsepc.yaml` file of the project. When providing the `--version` or `-v` option, you can look up the release
+status for a specific version. When specifying the `--version` option with `live`, you can look up the release status 
 of the version currently live or in rollout.
 
 ```shell
