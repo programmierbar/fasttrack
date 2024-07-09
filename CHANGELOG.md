@@ -1,3 +1,6 @@
+# 0.1.6
+* Upgrade dependencies
+
 # 0.1.5
 * Fix usage of releaseType in appstore_connect
 
