@@ -18,4 +18,5 @@ dependencies:
   googleapis_auth: ^1.3.0
   path: ^1.8.1
   yaml: ^3.1.0
+  win32: 5.13.0
 
