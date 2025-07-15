@@ -53,16 +53,8 @@ class AppStoreRolloutTask extends AppStoreCommandTask {
       return error('${this.version} not found');
     }
 
-      // the App Store connect api does not provide the 'appStoreVersionReleaseRequests'
-      // endpoint. therefore we have to use a hacky workaround to set the release type
-      // to scheduled and the release date to and date time in the past to switch the
-      // app version from the pendingForDeveloperRelease to readyForSale state. see
-      // https://github.com/fastlane/fastlane/discussions/18190#discussioncomment-492865
-      await version.updateReleaseType(
-        releaseType: ReleaseType.scheduled,
-        earliestReleaseDate: DateTime.now(),
-      );
     if (version.appVersionState == AppVersionState.pendingDeveloperRelease) {
+      await version.requestRelease();
 
       version = await client.awaitVersionInState(
         version: version.versionString,
