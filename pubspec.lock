@@ -21,10 +21,10 @@ packages:
     dependency: "direct main"
     description:
       name: appstore_connect
-      sha256: "13f9ced3a94597b302fc8256e15b8173cfa0c0853e4b0d047c0cf8056c67ba8f"
+      sha256: "63ad0c085a378d709839c3fa6f5549fbe774c3f6e34dc9d26aa689081d682b23"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.1"
+    version: "0.3.0"
   args:
     dependency: "direct main"
     description:
