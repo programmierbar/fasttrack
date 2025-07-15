@@ -53,7 +53,6 @@ class AppStoreRolloutTask extends AppStoreCommandTask {
       return error('${this.version} not found');
     }
 
-    if (version.appStoreState == AppStoreState.pendingDeveloperRelease) {
       // the App Store connect api does not provide the 'appStoreVersionReleaseRequests'
       // endpoint. therefore we have to use a hacky workaround to set the release type
       // to scheduled and the release date to and date time in the past to switch the
@@ -63,10 +62,11 @@ class AppStoreRolloutTask extends AppStoreCommandTask {
         releaseType: ReleaseType.scheduled,
         earliestReleaseDate: DateTime.now(),
       );
+    if (version.appVersionState == AppVersionState.pendingDeveloperRelease) {
 
       version = await client.awaitVersionInState(
         version: version.versionString,
-        state: AppStoreState.readyForSale,
+        state: AppVersionState.readyForDistribution,
         log: log,
       );
     }

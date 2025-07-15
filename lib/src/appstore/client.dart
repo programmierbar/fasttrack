@@ -111,14 +111,14 @@ class AppStoreApiClient {
   }
 
   Future<AppStoreVersion?> liveVersion() {
-    return _getVersion(states: AppStoreState.liveStates);
+    return _getVersion(states: AppVersionState.liveStates);
   }
 
   Future<AppStoreVersion?> editVersion() {
-    return _getVersion(states: [...AppStoreState.editStates, AppStoreState.pendingDeveloperRelease]);
+    return _getVersion(states: [...AppVersionState.editStates, AppVersionState.pendingDeveloperRelease]);
   }
 
-  Future<AppStoreVersion?> _getVersion({List<String>? versions, List<AppStoreState>? states}) async {
+  Future<AppStoreVersion?> _getVersion({List<String>? versions, List<AppVersionState>? states}) async {
     return (await api.getVersions(versions: versions, states: states, platforms: [_platform])).firstOrNull;
   }
 
@@ -128,7 +128,7 @@ class AppStoreApiClient {
 
   Future<AppStoreVersion> awaitVersionInState({
     required String version,
-    required AppStoreState state,
+    required AppVersionState state,
     Duration poll = _pollInterval,
     void Function(String)? log,
   }) async {

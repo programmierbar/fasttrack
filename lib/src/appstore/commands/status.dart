@@ -45,17 +45,17 @@ class AppStoreStatusTask extends AppStoreCommandTask {
     if (version.build != null) {
       parts.add('(${version.build!.version})');
     }
-    if (version.appStoreState != AppStoreState.readyForSale) {
-      parts.add(version.appStoreState.toString().toLowerCase());
-      if (version.appStoreState == AppStoreState.metadataRejected ||
-          version.appStoreState == AppStoreState.invalidBinary ||
-          version.appStoreState == AppStoreState.rejected) {
+    if (version.appVersionState != AppVersionState.readyForDistribution) {
+      parts.add(version.appVersionState.toString().toLowerCase());
+      if (version.appVersionState == AppVersionState.metadataRejected ||
+          version.appVersionState == AppVersionState.invalidBinary ||
+          version.appVersionState == AppVersionState.rejected) {
         color = StatusColor.error;
-      } else if (version.appStoreState == AppStoreState.pendingDeveloperRelease ||
-          version.appStoreState == AppStoreState.pendingAppleRelease) {
+      } else if (version.appVersionState == AppVersionState.pendingDeveloperRelease ||
+          version.appVersionState == AppVersionState.pendingAppleRelease) {
         color = StatusColor.success;
-      } else if (version.appStoreState == AppStoreState.waitingForReview ||
-          version.appStoreState == AppStoreState.inReview) {
+      } else if (version.appVersionState == AppVersionState.waitingForReview ||
+          version.appVersionState == AppVersionState.inReview) {
         color = StatusColor.warning;
       }
     } else {
