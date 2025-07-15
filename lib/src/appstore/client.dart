@@ -70,23 +70,6 @@ extension AppStoreVersionExtension on AppStoreVersion {
     return results.reduce((value, result) => value || result);
   }
 
-  Future<bool> updateSubmission({required bool rejected}) async {
-    if (!rejected && submission == null) {
-      await addSubmission();
-      return true;
-    }
-
-    if (rejected && submission != null) {
-      if (!submission!.canReject) {
-        throw TaskException('$versionString can not be rejected anymore');
-      }
-      await submission!.delete();
-      return true;
-    }
-
-    return false;
-  }
-
   Future<bool> updateReleaseState(PhasedReleaseState state) async {
     if (phasedRelease != null && phasedRelease!.phasedReleaseState != state) {
       await phasedRelease!.update(PhasedReleaseAttributes(phasedReleaseState: state));
@@ -98,7 +81,7 @@ extension AppStoreVersionExtension on AppStoreVersion {
 }
 
 class AppStoreApiClient {
-  static const _platform = AppStorePlatform.iOS;
+  static const _platform = AppStorePlatform.ios;
   static const _pollInterval = Duration(seconds: 15);
 
   final AppStoreConnectApi api;
@@ -181,5 +164,16 @@ class AppStoreApiClient {
         return build;
       }
     }
+  }
+
+  Future<ReviewSubmission?> getReviewSubmission({required AppStoreVersion version}) async {
+    final submissions = await api.getReviewSubmission();
+    return submissions.firstWhereOrNull((submission) => submission.appStoreVersionForReview.id == version.id);
+  }
+
+  Future<ReviewSubmission> submitReviewSubmission({required AppStoreVersion appStoreVersion}) async {
+    final submission = await api.postReviewSubmission(AppStorePlatform.ios);
+    await submission.postItem(appStoreVersion: appStoreVersion);
+    return submission.submit();
   }
 }

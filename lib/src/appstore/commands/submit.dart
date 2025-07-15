@@ -80,16 +80,26 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
     log('${this.version} submit for review');
     final version = await client.editVersion() ?? await client.createVersion(this.version);
 
-    if (AppStoreState.rejectableStates.contains(version.appStoreState)) {
+    if (reject) {
+      final existingSubmission = await client.getReviewSubmission(version: version);
+      if (existingSubmission == null) {
+        return error('No submission found for version "${version.versionString}"');
+      } else if (!version.rejectable) {
+        return error('Submission is not in rejectable state "${version.appVersionState}"');
+      } else {
+        await existingSubmission.cancel();
+        return success('${this.version} rejected from state "${version.appVersionState}"');
+      }
+    }
+
+    if (AppVersionState.rejectableStates.contains(version.appVersionState)) {
       // if the current editable version is already in pending developer release state,
       // we have to reject the version before we can attach a new build
       if (version.versionString != this.version) {
-        return error('${version.versionString} in pending developer release, reject it using the --reject flag');
-      } else if (reject) {
-        await version.updateSubmission(rejected: true);
-        return success('${this.version} rejected from pending developer release');
+        return error(
+            '${version.versionString} in "${version.appVersionState}" state, reject it using the --reject flag');
       } else {
-        return success('${this.version} is already in pending developer release');
+        return success('${this.version} is already submitted for review ("${version.appVersionState}")');
       }
     }
 
@@ -121,8 +131,7 @@ class AppStoreSubmitTask extends AppStoreCommandTask {
       await version.setBuild(build);
     }
 
-    if (await version.updateSubmission(rejected: reject)) {
-      log('${version.versionString} (${build.version}) ${reject ? 'rejected from review' : 'submitted for review'}');
-    }
+    await client.submitReviewSubmission(appStoreVersion: version);
+    log('${version.versionString} (${build.version}) submitted for review');
   }
 }
