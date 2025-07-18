@@ -1,3 +1,6 @@
+# 0.2.0
+* Adopt new appstore_connect version regarding review submissions
+
 # 0.1.6
 * Upgrade dependencies
 
